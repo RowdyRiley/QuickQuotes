@@ -1,7 +1,7 @@
 from bs4 import BeautifulSoup
 import requests
 from csv import writer
-NUM_PAGES = 3
+NUM_PAGES = 5
 
 # Arrays to hold quotes and authors
 quotes = []
