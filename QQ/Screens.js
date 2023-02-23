@@ -1,17 +1,37 @@
-// import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, View, Image, Button, Text, TextInput, FlatList} from 'react-native';
-import { SelectList } from 'react-native-dropdown-select-list';
-//import { Dropdown } from 'react-native-material-dropdown';
 import React from 'react';
+import { StyleSheet, View, Button, Text, FlatList} from 'react-native';
+import { SelectList } from 'react-native-dropdown-select-list';
 
-export default function App() {
+const QuoteFeed = ({ navigation }) => {
+  return (
+    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+      <Text>Welcome to the QuoteFeed</Text>
+      <Button
+        title="Go to Subjects"
+        onPress={() => navigation.navigate('Subjects')}
+      />
+      <Button
+        title="Go to Settings"
+        onPress={() => navigation.navigate('Settings')}
+      />
+
+      <Button
+        title="Give me a quote!"
+        onPress={() => console.log('Quote button pressed!')}
+      />
+
+    </View>
+  );
+};
+
+const SubjectsScreen = ({ navigation }) => {
   // which option was selected last in the selectlist
   const [selected, setSelected] = React.useState("");
   // current subjects for user
   let [data2, setData2] = React.useState([]);
   
-  // will update once we choose which subjucts we want the user to choose from
-  let data = [          
+  // add a subject  
+  let data = [
       {value:'Science'},
       {value:'History'},
       {value:'Microsoft'},
@@ -20,12 +40,11 @@ export default function App() {
       {value:'React Native'},
       {value:'Python'},
   ];
-  
-  // add a subject
+
+  // will update once we choose which subjucts we want the user to choose from
   const add = () => {
     setData2(data2.concat({value: selected}));
   }
-
 
   return (
     // container:  for green background and views within
@@ -67,7 +86,7 @@ export default function App() {
       <View style={SubjectStyles.container4}>
         <View style={SubjectStyles.container5}>
           <View style={{marginLeft: 35}}>
-            <Button style={SubjectStyles.button1}
+            <Button
               title="QuoteFeed"
               color= "white"
               onPress={() => navigation.navigate('QuoteFeed')}
@@ -75,7 +94,7 @@ export default function App() {
           </View>
           <Text style={{fontSize:35, color: 'white', marginLeft: '12%'}}>l</Text>
           <View style={{marginLeft: 38}}>
-            <Button style={SubjectStyles.button2}
+            <Button
               title="Settings"
               color= "white"
               onPress={() => navigation.navigate('Settings')}
@@ -147,9 +166,6 @@ const SubjectStyles = StyleSheet.create({
     marginRight: '17%',
     //flex: 0,
   },
-  dlist:{
-    backgroundColor: '#484035',
-  },
   flat: {
     backgroundColor: '#484035',
     marginRight: '74%',
@@ -175,17 +191,6 @@ const SubjectStyles = StyleSheet.create({
     paddingLeft: '25%',
     color: 'white',
     //alignSelf: 'center',
-  },
-  button1: {
-    //title:"QuoteFeed",
-    //color: "white",
-    //fontSize:"200", not working
-    // width: 20, not working
-  },
-  button2: {
-    //title:"Settings",
-    //color: "white",
-    //fontSize:"2",
   },
 
   // for flatlist
@@ -213,3 +218,27 @@ const SubjectStyles = StyleSheet.create({
   },
 });
 
+
+
+
+
+const SettingsScreen = ({ navigation }) => {
+  return (
+    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+      <Text>Welcome to the Settings</Text>
+      <Button
+        title="Go to Subjects"
+        onPress={() => navigation.navigate('Subjects')}
+      />
+      <Button
+        title="Go to QuoteFeed"
+        onPress={() => navigation.navigate('QuoteFeed')}
+      />
+    </View>
+  );
+};
+
+
+
+
+export { QuoteFeed, SubjectsScreen, SettingsScreen };
