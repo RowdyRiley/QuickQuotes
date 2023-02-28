@@ -15,6 +15,7 @@ Run server: python3 -m flask run
 
 Note on testing the server:
 Use an application such as Insomnia, Postman, or Curl to send requests, as the browser is only able to send GET requests.
+Refer to README.md in backend folder for more details.
 
 Run webscraper: python3 webscraper.py
 
