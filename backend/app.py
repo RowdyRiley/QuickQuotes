@@ -3,6 +3,9 @@ from dotenv import load_dotenv
 import psycopg2
 import os
 
+from utils.query_utils import *
+from utils.json_utils import *
+
 # Define flask app
 app = Flask(__name__)
 
@@ -17,21 +20,28 @@ conn = psycopg2.connect(url)
 cursor = conn.cursor()
 
 # Get a random quote that user hasn't seen, add it to seen list, return quote and comments
-@app.get("/quote")
+@app.get("/get-quote")
 def get_quote():
+
+    # Request data from the frontend as a json
+    data = request.get_json()
+    user_id = data["user_id"]
+
     with conn:
         with conn.cursor() as cursor:
 
-            # Define Query to get random quote
-            QUERY = '''SELECT * FROM quotes
-                       WHERE id NOT IN (SELECT quote_id FROM user_quotes_seen)
-                       ORDER BY random()
-                       LIMIT 1;'''
+            # Define Query to get random quote the user hasn't seen
+            QUERY = f'''SELECT * FROM quotes
+                        WHERE id NOT IN (SELECT quote_id FROM user_quotes_seen
+                                         WHERE user_id={user_id})
+                        ORDER BY random()
+                        LIMIT 1;'''
 
             # Execute Query
             cursor.execute(QUERY)
-            quote = cursor.fetchone()
-            quote_id = quote[0]
+            row = cursor.fetchone()
+            quote = construct_quote_json(row)
+            quote_id = quote["quote_id"]
 
             # Define Query to get comments associated with the quote
             QUERY = f'''SELECT * FROM comments
@@ -39,25 +49,23 @@ def get_quote():
 
             # Execute Query
             cursor.execute(QUERY)
-            comments = cursor.fetchall()
+            rows = cursor.fetchall()
+            comments = construct_comment_json(rows)
 
             # Define Query to insert quote user has seen
-            user_id = 1             # Placeholder until user profiles set up
-            quote_id = quote[0]
             QUERY = f'''INSERT INTO user_quotes_seen (user_id, quote_id)
-                        VALUES ({user_id}, {quote_id});'''
+                        VALUES ({user_id}, {quote_id})
+                        ON CONFLICT (user_id, quote_id) DO NOTHING;'''
 
             # Execute Query
             cursor.execute(QUERY)
 
     # Form response
-    response = make_response(jsonify(quote, comments), 200)
-    
-    # Success, return response
+    response = make_response(json_add(quote, comments, "comments"), 200)
     return response
 
 # Get a specific quote, return quote and comments
-@app.get("/specific")
+@app.get("/get-specific-quote")
 def get_specific_quote():
 
     # Request data from the frontend as a json
@@ -69,38 +77,135 @@ def get_specific_quote():
 
             # Define Query to get a specific quote
             QUERY = f'''SELECT * FROM quotes
-                        WHERE id={quote_id};'''
-
+                        WHERE quotes.id={quote_id};'''
             # Execute Query
             cursor.execute(QUERY)
-            quote = cursor.fetchone()
+            row = cursor.fetchone()
+            quote = construct_quote_json(row)
 
             # Define Query to get comments associated with the quote
-            QUERY = f'''SELECT * FROM comments
+            QUERY = f'''SELECT user_id, content FROM comments
                         WHERE quote_id={quote_id};'''
 
             # Execute Query
             cursor.execute(QUERY)
-            comments = cursor.fetchall()
+            rows = cursor.fetchall()
+            comments = construct_comment_json(rows)
+            
 
     # Form response
-    response = make_response(jsonify(quote, comments), 200)
-
-    # Success, return response
+    response = make_response(json_add(quote, comments, "comments"), 200)
     return response
 
-# Favorite a quote
-@app.put("/favorite")
+# Add a quote to user list of favorites
+@app.put("/add-favorite")
 def favorite_quote():
-    return
-
-# Post comment
-@app.post("/comment")
-def post_comment():
 
     # Request data from the frontend as a json
     data = request.get_json()
-    content = data["content"]
+    quote_id = data["quote_id"]
+    user_id = data["user_id"]
+
+    with conn:
+        with conn.cursor() as cursor:
+            
+            # Define a query to add a quote to user favorites
+            QUERY = f'''INSERT INTO user_quotes_favorited (user_id, quote_id)
+                        VALUES ({user_id}, {quote_id})
+                        ON CONFLICT (user_id, quote_id) DO NOTHING
+                        RETURNING *'''
+
+            # Execute query
+            cursor.execute(QUERY)
+
+            # Check if row was inserted
+            row = cursor.fetchone()
+
+    # Form response
+    if row is None:
+        # Row already exists
+        response = make_response("Already exists", 200)
+    else:
+        # Row was inserted
+        response = make_response("Created", 201)
+    return response
+
+# Return a list of quotes favorited by user
+@app.get("/get-favorite-quotes")
+def get_favorite_quotes():
+
+    # Request data from the frontend as a json
+    data = request.get_json()
+    user_id = data["user_id"]
+
+    with conn:
+        with conn.cursor() as cursor:
+
+            # Define query to retrieve list of quotes
+            QUERY = f'''SELECT * FROM quotes
+                        WHERE quotes.id IN (SELECT quote_id FROM user_quotes_favorited
+                                            WHERE user_id={user_id})'''
+            
+            # Execute query
+            cursor.execute(QUERY)
+            rows = cursor.fetchall()
+            quotes = construct_quote_list(rows)
+
+            # Retrieve comments for each quote
+            for quote in quotes:
+                quote_id = quote["quote_id"]
+
+                # Define query to retrieve comments from a quote
+                QUERY = f'''SELECT * FROM comments
+                            WHERE user_id={user_id} AND quote_id={quote_id}'''
+
+                # Execute query
+                cursor.execute(QUERY)
+                rows = cursor.fetchall()
+                comments = construct_comment_json(rows)
+                quote["comments"] = comments
+            
+    # Form response
+    response = make_response(quotes, 200)        
+    return response
+
+# Remove a quote from user list of favorites
+@app.delete("/remove-favorite")
+def remove_favorite_quote():
+
+    # Request data from the frontend as a json
+    data = request.get_json()
+    user_id = data["user_id"]
+    quote_id = data["quote_id"]
+
+    with conn:
+        with conn.cursor() as cursor:
+
+            # Define query to remove quote from user favorites
+            QUERY = f'''DELETE FROM user_quotes_favorited
+                        WHERE user_id = {user_id} AND quote_id = {quote_id}
+                        RETURNING *;'''
+
+            # Execute query
+            cursor.execute(QUERY)
+            row = cursor.fetchone()
+
+    # Form response
+    if row is None:
+        # Row doesn't exist
+        response = make_response("No content", 204)
+    else:
+        # Row was deleted
+        response = make_response("OK", 200)
+    return response
+
+# Post comment
+@app.post("/add-comment")
+def add_comment():
+
+    # Request data from the frontend as a json
+    data = request.get_json()
+    comment_content = data["comment_content"]
     quote_id = data["quote_id"]
     user_id = data["user_id"]
 
@@ -109,18 +214,129 @@ def post_comment():
 
             # Define Query to add comment
             QUERY = f'''INSERT INTO "comments" (content, quote_id, user_id)
-                        VALUES ('{content}', {quote_id}, {user_id});'''
+                        VALUES ('{comment_content}', {quote_id}, {user_id});'''
 
             # Execute Query
             cursor.execute(QUERY)
 
     # Form response
-    response = make_response("Success", 201)
-
-    # Success, return response
+    response = make_response("Created", 201)
     return response
 
 # Put rating; Each user may only have 1 rating per quote
-@app.put("/rating")
-def put_rating():
-    return
+@app.put("/modify-rating")
+def add_rating():
+
+    # Request data from the frontend as a json
+    data = request.get_json()
+    user_id = data["user_id"]
+    quote_id = data["quote_id"]
+    rating = data["rating"]
+
+    with conn:
+        with conn.cursor() as cursor:
+
+            # Define query to update rating for a quote
+            QUERY = f'''INSERT INTO ratings (user_id, quote_id, score)
+                        VALUES ({user_id}, {quote_id}, {rating})
+                        ON CONFLICT (user_id, quote_id) DO UPDATE
+                        SET score={rating}'''
+
+            # Execute query
+            cursor.execute(QUERY)
+
+            # Define query to update quote rating with new average
+            QUERY = f'''UPDATE quotes
+                        SET rating= (
+                            SELECT AVG(score) FROM ratings
+                            WHERE quote_id={quote_id}
+                        )
+                        WHERE id={quote_id}'''
+
+            # Execute query
+            cursor.execute(QUERY)
+
+    # Form response
+    response = make_response("OK", 200)
+    return response
+
+# Add a saved tag for user
+@app.put("/add-tag")
+def add_tag():
+
+    # Request data from the frontend as a json
+    data = request.get_json()
+    user_id = data["user_id"]
+    tag = data["tag"]
+
+    with conn:
+        with conn.cursor() as cursor:
+
+            # Define query to add save a tag to the user tags
+            QUERY = f'''INSERT INTO user_tags (user_id, tag_name)
+                        VALUES ({user_id}, '{tag}')
+                        ON CONFLICT (user_id, tag_name) DO NOTHING
+                        RETURNING *'''
+
+            # Execute query
+            cursor.execute(QUERY)
+            row = cursor.fetchone()
+
+    # Form response
+    if row is None:
+        response = make_response("Already exists", 200)
+    else:
+        response = make_response("Created", 201)
+    return response
+
+# Get all saved tags for user
+@app.get("/get-tags")
+def get_tags():
+    
+    # Request data from the frontend as a json
+    data = request.get_json()
+    user_id = data["user_id"]
+
+    with conn:
+        with conn.cursor() as cursor:
+
+            # Define query to retrieve list of quotes
+            QUERY = f'''SELECT tag_name FROM user_tags
+                        WHERE user_id={user_id}'''
+            
+            # Execute query
+            cursor.execute(QUERY)
+            rows = cursor.fetchall()
+            tags = construct_tag_list(rows)
+            
+    # Form response
+    response = make_response(jsonify(tags), 200)
+    return response
+
+# Remove a tag from list of saved tags for user
+@app.delete("/remove-tag")
+def remove_tag():
+
+    # Request data from the frontend as a json
+    data = request.get_json()
+    user_id = data["user_id"]
+    tag = data["tag"]
+
+    with conn:
+        with conn.cursor() as cursor:
+
+            # Define query to remove quote from user favorites
+            QUERY = f'''DELETE FROM user_tags
+                        WHERE user_id = {user_id} AND tag_name = '{tag}'
+                        RETURNING *;'''
+
+            # Execute query
+            cursor.execute(QUERY)
+            row = cursor.fetchone()
+
+    # Form response
+    if row is None:
+        response = make_response("No content", 204)
+    else:
+        response = make_response("OK", 200)
+    return response
