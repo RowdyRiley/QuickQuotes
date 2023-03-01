@@ -5,7 +5,7 @@ Instructions on running the server:
 Navigate to backend folder  
 Setup virtual environment: 'python3 -m venv venv'  
 Start virtual environment: '. venv/bin/activate'  
-If on Windows: 'Set-ExecutionPolicy Unrestricted -Force', then: '. venv/Scripts/activate' (If you are concerned about safety, backup the setting using 'get-ExecutionPolicy' and 'Set-ExecutionPolicy {Policy} -Force' after you are done.)  
+If on Windows: 'Set-ExecutionPolicy Unrestricted -Scope Process', then: '. venv/Scripts/activate'  
 Install requirements: 'pip install -r ../requirements.txt'  
 .flaskenv contains environment variables for flask for the app location and debugger settings.  
 .env contains environment variables indicating the database URL, retrieved using load_dotenv() from dotenv.    
