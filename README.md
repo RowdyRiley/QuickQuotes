@@ -10,10 +10,8 @@ Install requirements: 'pip install -r ../requirements.txt'
 .flaskenv contains environment variables for flask for the app location and debugger settings.  
 .env contains environment variables indicating the database URL, retrieved using load_dotenv() from dotenv.    
 
-Run server: flask run  
-Note on testing the server:  
-Use an application such as Insomnia, Postman, or Curl to send requests, as the browser is only able to send GET requests.  
-Refer to README.md in backend folder for more details.
+Run server: flask run -h {host} -p {port}    
+Refer to README.txt in backend folder for more details.
 
 Run webscraper: python3 webscraper.py  
 Note on csv files:  

@@ -39,7 +39,7 @@ Expects a json {
     "user_id": (int),  
     "quote_id": (int)  
 }  
-Returns a status response, 200: Already exists, 201: Created
+Returns a status response
 
 GET /get-favorite-quotes  
 Expects a json {"user_id": (int)}  
@@ -70,7 +70,7 @@ Expects a json {
 }  
 Returns a status response
 
-PUT /add-rating  
+PUT /modify-rating  
 Expects a json {  
     "user_id": (int),  
     "quote_id": (int),  
