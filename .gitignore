@@ -2,3 +2,7 @@
 __pycache__
 /backend/venv/
 /backend/__pycache__
+/.expo/
+/node_modules/
+/frontend/.expo/
+/frontend/node_modules/

@@ -6,7 +6,7 @@ Each function then defines a query for the database, executes it, and stores the
 
 At the end of each function, they store the data in a json and package that into a response along with the status code.
 
-GET /get-quote  
+POST /get-quote  
 Expects a json {"user_id": (int)}  
 Returns a json {  
     "quote_id": (int),  
@@ -20,7 +20,7 @@ Returns a json {
     }
 }
 
-GET /get-specific-quote  
+POST /get-specific-quote  
 Expects a json {"quote_id": (int)}  
 Returns a json {  
     "quote_id": (int),  
@@ -41,7 +41,7 @@ Expects a json {
 }  
 Returns a status response
 
-GET /get-favorite-quotes  
+POST /get-favorite-quotes  
 Expects a json {"user_id": (int)}  
 Returns a list of key-value pairs {  
     "quote_id": (int),  
@@ -85,7 +85,7 @@ Expects a json {
 }  
 Returns a status response
 
-GET /get-tags  
+POST /get-tags  
 Expects a json {"user_id": (int)}  
 Returns a list of strings  
 
