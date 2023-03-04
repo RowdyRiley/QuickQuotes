@@ -4,8 +4,8 @@ CSE 115 Group Project
 Instructions on setting up the app:  
 Navigate to frontend folder  
 Install packages: ```npm install```  
-Navigate to screens.js  
-Change the URL to the host and port that you are running your server on  
+Navigate to screens.js
+Change the URL to the host and port that you are running your server on
 Run server: ```expo start```
 
 Instructions on setting up the server:  
