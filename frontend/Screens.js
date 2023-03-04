@@ -5,7 +5,7 @@ import { SelectList } from 'react-native-dropdown-select-list';
 import {Modal, Alert} from 'react-native';
 
 // Insert the your server ip and port here
-const URL = "http://192.168.1.197:port";
+const URL = "";
 
 class Quote {
   constructor(id, quote, author, tag, rating, comments) {
