@@ -20,7 +20,7 @@ conn = psycopg2.connect(url)
 cursor = conn.cursor()
 
 # Get a random quote that user hasn't seen, add it to seen list, return quote and comments
-@app.get("/get-quote")
+@app.post("/get-quote")
 def get_quote():
 
     # Request data from the frontend as a json
@@ -65,7 +65,7 @@ def get_quote():
     return response
 
 # Get a specific quote, return quote and comments
-@app.get("/get-specific-quote")
+@app.post("/get-specific-quote")
 def get_specific_quote():
 
     # Request data from the frontend as a json
@@ -131,7 +131,7 @@ def favorite_quote():
     return response
 
 # Return a list of quotes favorited by user
-@app.get("/get-favorite-quotes")
+@app.post("/get-favorite-quotes")
 def get_favorite_quotes():
 
     # Request data from the frontend as a json
@@ -290,7 +290,7 @@ def add_tag():
     return response
 
 # Get all saved tags for user
-@app.get("/get-tags")
+@app.post("/get-tags")
 def get_tags():
     
     # Request data from the frontend as a json
