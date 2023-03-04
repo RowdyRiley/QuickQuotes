@@ -1,11 +1,11 @@
 import { StatusBar } from 'expo-status-bar';
 import React, {useState} from 'react';
-import { StyleSheet, View, Text, Button, ScrollView, Pressable, FlatList} from 'react-native';
+import { StyleSheet, View, Text, Button, ScrollView, Pressable, FlatList, TouchableOpacity} from 'react-native';
 import { SelectList } from 'react-native-dropdown-select-list';
 import {Modal, Alert} from 'react-native';
 
 // Insert the your server ip and port here
-const URL = "";
+const URL = "http://192.168.1.197:5000";
 
 class Quote {
   constructor(id, quote, author, tag, rating, comments) {
@@ -17,7 +17,10 @@ class Quote {
     this.comments = comments;
   }
 }
+
+// Store the quotes for the feed
 const quoteQueue = [];
+const savedSubjects = [];
 
 const QuoteFeed = ({ navigation }) => {
   const [quoteId, setQuoteId] = useState('');
@@ -27,6 +30,24 @@ const QuoteFeed = ({ navigation }) => {
   const [rating, setRating] = useState('');
   const [comments, setComments] = useState('');
 
+  const handleNewQuote = (data) => {
+    // Store quote data in a Quote object
+    setQuoteId(data.quote_id);
+    setQuote(data.quote_content);
+    setAuthor(data.author);
+    setTag(data.tag);
+    setRating(data.rating);
+    setComments(data.comments);
+    const newQuote = new Quote(quoteId, quote, author, tag, rating, comments);
+
+    // Push quote to queue
+    quoteQueue.unshift(newQuote);
+    if (quoteQueue.length > 15) {
+      quoteQueue.pop();
+    }
+  }
+
+  // Request a quote from the server, providing user id
   const getQuote = () => {
     fetch(URL + '/get-quote', {
       method: 'POST',
@@ -40,19 +61,25 @@ const QuoteFeed = ({ navigation }) => {
     })
     .then((response) => response.json())
     .then((data) => {
-      setQuoteId(data.quote_id);
-      setQuote(data.quote_content);
-      setAuthor(data.author);
-      setTag(data.tag);
-      setRating(data.rating);
-      setComments(data.comments);
+      if (data) {
+        handleNewQuote(data);
+      }
     });
-    const newQuote = new Quote(quoteId, quote, author, tag, rating, comments);
-    quoteQueue.push(newQuote);
-    if (quoteQueue.length > 15) {
-      quoteQueue.shift();
-    }
   };
+
+  const handleQuotePress = () => {
+    // Display additional quote information here
+  }
+
+  // Display quote in a pressable button
+  const renderQuote = (quote) => (
+    <TouchableOpacity key={quote.id} onPress={() => handleQuotePress(quote)}>
+      <Text style={QuoteFeedStyles.Quote}>Quote: {quote.quote}</Text>
+      <Text style={QuoteFeedStyles.Quote}>Author: {quote.author}</Text>
+      <Text style={QuoteFeedStyles.Quote}>Tag: {quote.tag}</Text>
+      <View style={QuoteFeedStyles.HorizontalLine} />
+    </TouchableOpacity>
+  )
 
   return (
       
@@ -63,14 +90,7 @@ const QuoteFeed = ({ navigation }) => {
           </View>
 
           <ScrollView style={QuoteFeedStyles.Scroll}>
-            {quoteQueue.map((quote) => (
-              <View key={quote.id}>
-                <Text style={QuoteFeedStyles.Quote}>Quote: {quote.quote}</Text>
-                <Text style={QuoteFeedStyles.Quote}>Author: {quote.author}</Text>
-                <Text style={QuoteFeedStyles.Quote}>Tag: {quote.tag}</Text>
-                <View style={QuoteFeedStyles.HorizontalLine} />
-              </View>
-            ))}
+            {quoteQueue.map(renderQuote)}
           </ScrollView>
         </View>
 
@@ -183,199 +203,213 @@ const QuoteFeedStyles = StyleSheet.create({
   },
 })
 
+//const savedSubjects = [];
+
 const SubjectsScreen = ({ navigation }) => {
-    // which option was selected last in the selectlist
-  const [selected, setSelected] = React.useState("");
+  // which option was selected last in the selectlist
+  const [selectedSubject, setSelectedSubject] = React.useState("");
   // current subjects for user
-  let [data2, setData2] = React.useState([]);
+  const [userSubjects, setUserSubjects] = React.useState([]);
   
   // add a subject  
-  let data = [
-      {value:'Science'},
-      {value:'History'},
-      {value:'Microsoft'},
-      {value:'Apple'},
-      {value:'Google'},
-      {value:'React Native'},
-      {value:'Python'},
+  const subjectOptions = [
+      {key: 1, value:'Science'},
+      {key: 2, value:'History'},
+      {key: 3, value:'Microsoft'},
+      {key: 4, value:'Apple'},
+      {key: 5, value:'Google'},
+      {key: 6, value:'React Native'},
+      {key: 7, value:'Python'},
   ];
 
-  // will update once we choose which subjucts we want the user to choose from
-  const add = () => {
-    setData2(data2.concat({value: selected}));
+  const addSubject = () => {
+    // Find the subject object given the key
+    subjectName = subjectOptions.find(item => item.key === selectedSubject)
+
+    // Adds the subject to savedSubjects if it is not already in there
+    if (!savedSubjects.some(item => item.key === subjectName.key)) {
+      savedSubjects.push(subjectName);
+      setUserSubjects([...savedSubjects]);
+    }
   }
+
+  // Display subject name
+  const renderSubject = ({item}) => (
+    <View key={item.key} style={SubjectStyles.itemContainer}>
+      <View style={SubjectStyles.titleContainer}>
+        <Text style={SubjectStyles.title2}>{item.value}</Text>
+      </View>
+    </View>
+  )
 
   return (
     // container:  for green background and views within
     // container2: for brown background and views within
     // container3: for the title 'Subjects'
-    // continer4:  for brown background around buttons
+    // container4: for brown background around buttons
     // container5: for transparent background around buttons
-    <View style={SubjectStyles.container}>
-      <View style={SubjectStyles.container2}>
-        <View style={SubjectStyles.container3}>
-          <Text style={SubjectStyles.title}>Subjects</Text>   
-        </View>                                                                               
-        <View style={{flexDirection: 'row'}}>
+    // Easier and more consistent to reuse QuoteFeed's containers; Promotes reusability
+    <View style={QuoteFeedStyles.GreenBackground}>
+      <View style={QuoteFeedStyles.QuoteFeed}>
+        <View style={QuoteFeedStyles.QuoteFeedTitleBackground}>
+          <Text style={QuoteFeedStyles.QuoteFeedTitleText}>Subjects</Text>   
+        </View>                      
+                                                                 
+        <View style={{flexDirection: 'row', height: '75%'}}>
+          <View style={SubjectStyles.flist}>
             <FlatList                                                                     
-              data={data2}
-              renderItem={({ item }) => (
-                <View style={SubjectStyles.itemContainer}>
-                  <View style={SubjectStyles.titleContainer}>
-                    <Text style={SubjectStyles.title2}>{item.value}</Text>
-                  </View>
-                </View>
-              )}  
+              data={savedSubjects}
+              renderItem={renderSubject}  
               keyExtractor={(item) => item.value}
               ItemSeparatorComponent={() => <View style={SubjectStyles.separator} />}        
             />
+          </View>
+
           <View style={SubjectStyles.slist}>
             <SelectList 
-              setSelected={(val) => setSelected(val)} 
+              setSelected={(val) => setSelectedSubject(val)} 
               style={{backgroundColor: '#605647', color: 'white'}} 
               placeholder="Add new +"
-              data={data}  
-              save="value"
-              color= "white"
-              onSelect={() => add()}
+              data={subjectOptions}  
+              save="key"  // save the key value of the subject object
+              color="white"
+              onSelect={addSubject}
             />
           </View>
         </View>
       </View>
-      <View style={SubjectStyles.container4}>
-        <View style={SubjectStyles.container5}>
-          <View style={{marginLeft: 35}}>
-            <Button
-              title="QuoteFeed"
-              color= "white"
-              onPress={() => navigation.navigate('QuoteFeed')}
-            />
-          </View>
-          <Text style={{fontSize:35, color: 'white', marginLeft: '12%'}}>l</Text>
-          <View style={{marginLeft: 38}}>
-            <Button
-              title="Settings"
-              color= "white"
-              onPress={() => navigation.navigate('Settings')}
-            />
-          </View>
-        </View>
+
+      <View style={QuoteFeedStyles.TaskbarBackground}>
+        <Pressable style={QuoteFeedStyles.SubjectsButton} onPress={() => navigation.navigate('QuoteFeed')}>
+          <Text style={QuoteFeedStyles.TaskbarTitleText}>QuoteFeed</Text>
+        </Pressable>
+
+        <Pressable style={QuoteFeedStyles.SettingsButton} onPress={() => navigation.navigate('Settings')}>
+          <Text style={QuoteFeedStyles.TaskbarTitleText}>Settings</Text>
+        </Pressable>
       </View>
     </View>
   );
-  };
+};
 
-  const SubjectStyles = StyleSheet.create({
-    container: {
-      flex: 1, 
-      backgroundColor: '#5c6540',
-      paddingTop: '10%',
-      paddingBottom: '20%',
-      paddingLeft:  '5%',
-      paddingRight: '5%',
-    },
-    container2: {
-      flex: 1,
-      //paddingTop: '%',
-      paddingLeft: '10%',
-      marginBottom: '4%',
-      //alignContent: 'space-between',
-      backgroundColor: '#867965',
-      borderTopLeftRadius: 7,
-      borderTopRightRadius: 7,
-      borderBottomLeftRadius: 7,
-      borderBottomRightRadius: 7,
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.25,
-      shadowRadius: 7,
-    },
-    container3: {
-      flex: 0,
-      paddingTop: '0%',
-      paddingBottom: '3%',
-      // paddingLeft:  '5%',
-      // paddingRight: '5%',
-      backgroundColor: '#484035',
-      marginTop: '5%',
-      marginLeft: '-11.3%',
-      marginBottom: '5%',
-      color: 'white',
-    },
-    container4: {
-      backgroundColor: '#867965',
-      marginBottom: '-22%',
-      marginLeft: '-6%',
-      marginRight: '-6%',
-    },
-    container5: {
-      backgroundColor: '#484035',
-      marginTop: '2%',
-      //marginLeft: '-11.3%',
-      marginBottom: '2%',
-      //color: 'white',
-      flexDirection: 'row',
-      //marginHorizontal: 20,
-    },
-    slist: {
-      //padding: -100,
-      //alignItems: 'center',
-      color: 'white',
-      marginLeft: '-55%',
-      marginRight: '17%',
-      //flex: 0,
-    },
-    flat: {
-      backgroundColor: '#484035',
-      marginRight: '74%',
-      borderTopLeftRadius: 7,
-      borderTopRightRadius: 7,
-      borderBottomLeftRadius: 7,
-      borderBottomRightRadius: 7,
-      //flex: 1,
-      //paddingTop: 90
-    },
-    item: {
-      color: 'white',
-      padding: 20,
-      borderColor: 'black',
-      borderWidth: 2,
-      borderRadius: 10,
-    },
-    title: {
-      marginTop: 10,
-      marginLeft: 35,
-      //margin: 20,
-      fontSize: 28,
-      paddingLeft: '25%',
-      color: 'white',
-      //alignSelf: 'center',
-    },
-  
-    // for flatlist
-    itemContainer: {
-      backgroundColor: '#867965',
-      overflow: 'hidden',
-      borderBottomColor: 'transparent',
-      borderTopColor: 'transparent',
-      borderLeftColor: 'transparent',
-      borderRightColor: 'transparent',
-      marginRight: '73%',
-    },
-    titleContainer: {
-      backgroundColor: '#484035',
-      padding: 10,
-      borderRadius: 10,
-    },
-    title2: {
-      fontSize: 12,
-      color: 'white',
-    },
-    separator: {
-      height: 10,
-      backgroundColor: 'transparent',
-    },
-  });
+const SubjectStyles = StyleSheet.create({
+  container: {
+    flex: 1, 
+    backgroundColor: '#5c6540',
+    paddingTop: '10%',
+    paddingBottom: '20%',
+    paddingLeft:  '5%',
+    paddingRight: '5%',
+  },
+  container2: {
+    flex: 1,
+    //paddingTop: '%',
+    paddingLeft: '10%',
+    marginBottom: '4%',
+    //alignContent: 'space-between',
+    backgroundColor: '#867965',
+    borderTopLeftRadius: 7,
+    borderTopRightRadius: 7,
+    borderBottomLeftRadius: 7,
+    borderBottomRightRadius: 7,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 7,
+  },
+  container3: {
+    flex: 0,
+    paddingTop: '0%',
+    paddingBottom: '3%',
+    // paddingLeft:  '5%',
+    // paddingRight: '5%',
+    backgroundColor: '#484035',
+    marginTop: '5%',
+    marginLeft: '-11.3%',
+    marginBottom: '5%',
+    color: 'white',
+  },
+  container4: {
+    backgroundColor: '#867965',
+    marginBottom: '-22%',
+    marginLeft: '-6%',
+    marginRight: '-6%',
+  },
+  container5: {
+    backgroundColor: '#484035',
+    marginTop: '2%',
+    //marginLeft: '-11.3%',
+    marginBottom: '2%',
+    //color: 'white',
+    flexDirection: 'row',
+    //marginHorizontal: 20,
+  },
+  flist: {
+    width: '45%',
+    height: '100%',
+    marginTop: '10%',
+    marginLeft: '5%',
+  },
+  slist: {
+    //padding: -100,
+    //alignItems: 'center',
+    color: 'white',
+    width: '45%',
+    height: '100%',
+    marginTop: '10%',
+    marginRight: '5%',
+    //flex: 0,
+  },
+  flat: {
+    backgroundColor: '#484035',
+    marginRight: '74%',
+    borderTopLeftRadius: 7,
+    borderTopRightRadius: 7,
+    borderBottomLeftRadius: 7,
+    borderBottomRightRadius: 7,
+    //flex: 1,
+    //paddingTop: 90
+  },
+  item: {
+    color: 'white',
+    padding: 20,
+    borderColor: 'black',
+    borderWidth: 2,
+    borderRadius: 10,
+  },
+  title: {
+    marginTop: 10,
+    marginLeft: 35,
+    //margin: 20,
+    fontSize: 28,
+    paddingLeft: '25%',
+    color: 'white',
+    //alignSelf: 'center',
+  },
+  // for flatlist
+  itemContainer: {
+    backgroundColor: '#867965',
+    overflow: 'hidden',
+    borderBottomColor: 'transparent',
+    borderTopColor: 'transparent',
+    borderLeftColor: 'transparent',
+    borderRightColor: 'transparent',
+    marginRight: '5%',
+  },
+  titleContainer: {
+    backgroundColor: '#484035',
+    padding: 10,
+    borderRadius: 10,
+  },
+  title2: {
+    fontSize: 12,
+    color: 'white',
+  },
+  separator: {
+    height: 10,
+    backgroundColor: 'transparent',
+  },
+});
 
 const SettingsScreen = ({ navigation }) => {
   const [modalVisible, setModalVisible] = useState(false);
