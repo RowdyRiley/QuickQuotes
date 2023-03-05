@@ -1,7 +1,7 @@
 def construct_tag_list(rows):
     tags = []
     for row in rows:
-        tags.append(row[0])
+        tags.append({"key": row[0], "value": row[1]})
     return tags
 
 def construct_quote_list(rows):
