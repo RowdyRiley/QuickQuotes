@@ -31,15 +31,24 @@ def get_quote():
         with conn.cursor() as cursor:
 
             # Define Query to get random quote the user hasn't seen
-            QUERY = f'''SELECT * FROM quotes
-                        WHERE id NOT IN (SELECT quote_id FROM user_quotes_seen
-                                         WHERE user_id={user_id})
+            QUERY = f'''SELECT * FROM quotes q
+                        INNER JOIN tags t ON q.tag_name = t.name
+                        WHERE q.id NOT IN (SELECT quote_id FROM user_quotes_seen 
+                                           WHERE user_id = {user_id})
+                        AND t.name IN (SELECT tag_name FROM user_tags 
+                                       WHERE user_id = {user_id})
                         ORDER BY random()
                         LIMIT 1;'''
 
             # Execute Query
             cursor.execute(QUERY)
             row = cursor.fetchone()
+
+            # Check if any data was returned
+            if row is None:
+                return make_response("No quotes found", 204)
+
+            # Turn quote into json format
             quote = construct_quote_json(row)
             quote_id = quote["quote_id"]
 
@@ -301,12 +310,14 @@ def get_tags():
         with conn.cursor() as cursor:
 
             # Define query to retrieve list of quotes
-            QUERY = f'''SELECT tag_name FROM user_tags
-                        WHERE user_id={user_id}'''
+            QUERY = f'''SELECT * FROM tags
+                        WHERE name IN (SELECT tag_name FROM user_tags
+                                       WHERE user_id={user_id})'''
             
             # Execute query
             cursor.execute(QUERY)
             rows = cursor.fetchall()
+            print(rows)
             tags = construct_tag_list(rows)
             
     # Form response
@@ -339,4 +350,22 @@ def remove_tag():
         response = make_response("No content", 204)
     else:
         response = make_response("OK", 200)
+    return response
+
+@app.get("/get-all-tags")
+def get_all_tags():
+
+    with conn:
+        with conn.cursor() as cursor:
+
+            # Define query to retrieve list of quotes
+            QUERY = f'''SELECT * FROM tags'''
+            
+            # Execute query
+            cursor.execute(QUERY)
+            rows = cursor.fetchall()
+            tags = construct_tag_list(rows)
+            
+    # Form response
+    response = make_response(tags, 200)
     return response

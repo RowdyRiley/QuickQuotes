@@ -1,55 +1,41 @@
 import { StatusBar } from 'expo-status-bar';
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import { StyleSheet, View, Text, Button, ScrollView, Pressable, FlatList, TouchableOpacity} from 'react-native';
 import { SelectList } from 'react-native-dropdown-select-list';
 import {Modal, Alert} from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Insert the your server ip and port here
 const URL = "http://192.168.1.197:port";
 
-class Quote {
-  constructor(id, quote, author, tag, rating, comments) {
-    this.id = id;
-    this.quote = quote;
-    this.author = author;
-    this.tag = tag;
-    this.rating = rating;
-    this.comments = comments;
-  }
-}
-
-// Store the quotes for the feed
-const quoteQueue = [];
-const savedSubjects = [];
-
 const QuoteFeed = ({ navigation }) => {
-  const [quoteId, setQuoteId] = useState('');
-  const [quote, setQuote] = useState('');
-  const [author, setAuthor] = useState('');
-  const [tag, setTag] = useState('');
-  const [rating, setRating] = useState('');
-  const [comments, setComments] = useState('');
+  // Queue to store quotes to be displayed 
+  const [quoteQueue, setQuoteQueue] = useState([]);
 
   const handleNewQuote = (data) => {
-    // Store quote data in a Quote object
-    setQuoteId(data.quote_id);
-    setQuote(data.quote_content);
-    setAuthor(data.author);
-    setTag(data.tag);
-    setRating(data.rating);
-    setComments(data.comments);
-    const newQuote = new Quote(quoteId, quote, author, tag, rating, comments);
+    // Parse the data for a quote
+    const newQuote = JSON.parse(JSON.stringify(data))
 
     // Push quote to queue
-    quoteQueue.unshift(newQuote);
-    if (quoteQueue.length > 15) {
-      quoteQueue.pop();
-    }
+    setQuoteQueue((prevQueue) => [newQuote, ...prevQueue.slice(0, 14)]);
+
+    // Save the queue to AsyncStorage
+    AsyncStorage.setItem('quoteQueue', JSON.stringify(quoteQueue));
   }
 
-  // Request a quote from the server, providing user id
-  const getQuote = () => {
-    fetch(URL + '/get-quote', {
+  // Display the saved quote feed when app is launched
+  useEffect(() => {
+    AsyncStorage.getItem('quoteQueue')
+    .then((quoteQueueJSON) => {
+      if (quoteQueueJSON) {
+        setQuoteQueue(JSON.parse(quoteQueueJSON));
+      }
+    })
+  }, []);
+
+  // Make an API request to get a random quote
+  const getQuote = async () => {
+    const response = await fetch(URL + '/get-quote', {
       method: 'POST',
       headers: {
         Accept: 'application/json',
@@ -58,23 +44,24 @@ const QuoteFeed = ({ navigation }) => {
       body: JSON.stringify({
         user_id: 1
       })
-    })
-    .then((response) => response.json())
-    .then((data) => {
+    });
+    if (response.status == 200) {
+      const data = await response.json();
       if (data) {
         handleNewQuote(data);
       }
-    });
+    }
   };
 
+  // Display additional quote information here
   const handleQuotePress = () => {
-    // Display additional quote information here
+    
   }
 
   // Display quote in a pressable button
   const renderQuote = (quote) => (
-    <TouchableOpacity key={quote.id} onPress={() => handleQuotePress(quote)}>
-      <Text style={QuoteFeedStyles.Quote}>Quote: {quote.quote}</Text>
+    <TouchableOpacity key={quote.quote_id} onPress={() => handleQuotePress(quote)}>
+      <Text style={QuoteFeedStyles.Quote}>Quote: {quote.quote_content}</Text>
       <Text style={QuoteFeedStyles.Quote}>Author: {quote.author}</Text>
       <Text style={QuoteFeedStyles.Quote}>Tag: {quote.tag}</Text>
       <View style={QuoteFeedStyles.HorizontalLine} />
@@ -90,7 +77,7 @@ const QuoteFeed = ({ navigation }) => {
           </View>
 
           <ScrollView style={QuoteFeedStyles.Scroll}>
-            {quoteQueue.map(renderQuote)}
+            {quoteQueue.map(renderQuote)} 
           </ScrollView>
         </View>
 
@@ -115,6 +102,7 @@ const QuoteFeed = ({ navigation }) => {
     
   );
 };
+
 const QuoteFeedStyles = StyleSheet.create({
   GreenBackground: {
     flex: 1,
@@ -203,43 +191,137 @@ const QuoteFeedStyles = StyleSheet.create({
   },
 })
 
-//const savedSubjects = [];
-
 const SubjectsScreen = ({ navigation }) => {
+  // List of available subjects
+  const [subjectOptions, setSubjectOptions] = React.useState([]);
   // which option was selected last in the selectlist
-  const [selectedSubject, setSelectedSubject] = React.useState("");
+  const [selectedSubjectKey, setSelectedSubjectKey] = React.useState("");
   // current subjects for user
   const [userSubjects, setUserSubjects] = React.useState([]);
-  
-  // add a subject  
-  const subjectOptions = [
-      {key: 1, value:'Science'},
-      {key: 2, value:'History'},
-      {key: 3, value:'Microsoft'},
-      {key: 4, value:'Apple'},
-      {key: 5, value:'Google'},
-      {key: 6, value:'React Native'},
-      {key: 7, value:'Python'},
-  ];
 
+  // Make an API request to get list of available subject options
+  const getSubjectOptions = async () => {
+    try {
+      const response = await fetch(URL + '/get-all-tags');
+      const data = await response.json();
+      if (data) {
+        setSubjectOptions([...data]);
+      }
+    } catch (error) {
+      console.log("Error in getSubjectOptions:", error)
+    }
+  }
+
+  // Make an API request to get list of user's saved subjects
+  const getUserSubjects = async () => {
+    try {
+      const response = await fetch(URL + '/get-tags', {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          user_id: 1
+        })
+      });
+      const data = await response.json();
+      if (data) {
+        setUserSubjects([...data]);
+      }
+    } catch (error) {
+      console.log("Error in getUserSubjects:", error);
+    }
+  };
+
+  // Make an API request to add a subject to list of user's saved subjects
+  const addSubjectToDatabase = async (subject) => {
+    try {
+      const response = await fetch(URL + '/add-tag', {
+        method: 'PUT',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          user_id: 1,
+          tag: subject.value
+        })
+      });
+    } catch (error) {
+      console.log("Error in addSubjectToDatabase:", error);
+    }
+  };
+
+  // Make an API request to remove a subject from list of user's saved subjects
+  const removeSubjectFromDatabase = async (subject) => {
+    try {
+      const response = await fetch(URL + '/remove-tag', {
+        method: 'DELETE',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          user_id: 1,
+          tag: subject.value
+        })
+      });
+    } catch (error) {
+      console.log("Error in removeSubjectFromDatabase:", error);
+    }
+  }
+
+  // Make API calls when the page is loaded to get
+  // the subjectOptions and userSubjects
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const subjectData = await getSubjectOptions();
+        const userData = await getUserSubjects();
+        if (subjectData) {
+          setSubjectOptions([...subjectData]);
+        }
+        if (userData) {
+          setUserSubjects([...userData]);
+        }
+      } catch (error) {
+        console.log("Error in Subjects Screen useEffect:", error);
+      }
+    }
+    fetchData();
+  }, []);
+
+  // Add the subject to user's list
   const addSubject = () => {
     // Find the subject object given the key
-    subjectName = subjectOptions.find(item => item.key === selectedSubject)
+    const newSubject = subjectOptions.find(item => item.key === selectedSubjectKey)
 
-    // Adds the subject to savedSubjects if it is not already in there
-    if (!savedSubjects.some(item => item.key === subjectName.key)) {
-      savedSubjects.push(subjectName);
-      setUserSubjects([...savedSubjects]);
+    // Adds the subject if it is not already in there
+    if (!userSubjects.some(item => item.key === newSubject.key)) {
+      setUserSubjects(prevUserSubjects => [...prevUserSubjects, newSubject]);
+      addSubjectToDatabase(newSubject);
+    }
+  }
+
+  // Remove the subject from user's list
+  const removeSubject = (subjectToRemove) => {
+    if (userSubjects.some(item => item.key === subjectToRemove.key)) {
+      const newArray = userSubjects.filter((subject) => subject !== subjectToRemove);
+      setUserSubjects(newArray);
+      removeSubjectFromDatabase(subjectToRemove);
     }
   }
 
   // Display subject name
   const renderSubject = ({item}) => (
-    <View key={item.key} style={SubjectStyles.itemContainer}>
-      <View style={SubjectStyles.titleContainer}>
-        <Text style={SubjectStyles.title2}>{item.value}</Text>
+    <TouchableOpacity onPress={() => removeSubject(item)}>
+      <View key={item.key} style={SubjectStyles.itemContainer}>
+        <View style={SubjectStyles.titleContainer}>
+          <Text style={SubjectStyles.title2}>{item.value}</Text>
+        </View>
       </View>
-    </View>
+    </TouchableOpacity>
   )
 
   return (
@@ -258,16 +340,16 @@ const SubjectsScreen = ({ navigation }) => {
         <View style={{flexDirection: 'row', height: '75%'}}>
           <View style={SubjectStyles.flist}>
             <FlatList                                                                     
-              data={savedSubjects}
+              data={userSubjects}
               renderItem={renderSubject}  
-              keyExtractor={(item) => item.value}
+              keyExtractor={(item) => item.key}
               ItemSeparatorComponent={() => <View style={SubjectStyles.separator} />}        
             />
           </View>
 
           <View style={SubjectStyles.slist}>
             <SelectList 
-              setSelected={(val) => setSelectedSubject(val)} 
+              setSelected={(val) => setSelectedSubjectKey(val)} 
               style={{backgroundColor: '#605647', color: 'white'}} 
               placeholder="Add new +"
               data={subjectOptions}  
