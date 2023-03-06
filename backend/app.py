@@ -34,14 +34,15 @@ def get_quote():
             QUERY = f'''SELECT * FROM quotes q
                         INNER JOIN tags t ON q.tag_name = t.name
                         WHERE q.id NOT IN (SELECT quote_id FROM user_quotes_seen 
-                                           WHERE user_id = {user_id})
+                                           WHERE user_id = %s)
                         AND t.name IN (SELECT tag_name FROM user_tags 
-                                       WHERE user_id = {user_id})
+                                       WHERE user_id = %s)
                         ORDER BY random()
                         LIMIT 1;'''
 
             # Execute Query
-            cursor.execute(QUERY)
+            query_input = (user_id, user_id)
+            cursor.execute(QUERY, query_input)
             row = cursor.fetchone()
 
             # Check if any data was returned
@@ -54,10 +55,11 @@ def get_quote():
 
             # Define Query to get comments associated with the quote
             QUERY = f'''SELECT * FROM comments
-                        WHERE quote_id={quote_id};'''
+                        WHERE quote_id=%s;'''
 
             # Execute Query
-            cursor.execute(QUERY)
+            query_input = (quote_id,)
+            cursor.execute(QUERY, query_input)
             rows = cursor.fetchall()
             comments = construct_comment_json(rows)
 
@@ -86,18 +88,20 @@ def get_specific_quote():
 
             # Define Query to get a specific quote
             QUERY = f'''SELECT * FROM quotes
-                        WHERE quotes.id={quote_id};'''
+                        WHERE quotes.id=%s;'''
             # Execute Query
-            cursor.execute(QUERY)
+            query_input = (quote_id,)
+            cursor.execute(QUERY, query_input)
             row = cursor.fetchone()
             quote = construct_quote_json(row)
 
             # Define Query to get comments associated with the quote
             QUERY = f'''SELECT user_id, content FROM comments
-                        WHERE quote_id={quote_id};'''
+                        WHERE quote_id=%s;'''
 
             # Execute Query
-            cursor.execute(QUERY)
+            query_input = (quote_id,)
+            cursor.execute(QUERY, query_input)
             rows = cursor.fetchall()
             comments = construct_comment_json(rows)
             
@@ -120,12 +124,13 @@ def favorite_quote():
             
             # Define a query to add a quote to user favorites
             QUERY = f'''INSERT INTO user_quotes_favorited (user_id, quote_id)
-                        VALUES ({user_id}, {quote_id})
+                        VALUES (%s, %s)
                         ON CONFLICT (user_id, quote_id) DO NOTHING
                         RETURNING *'''
 
             # Execute query
-            cursor.execute(QUERY)
+            query_input = (user_id, quote_id)
+            cursor.execute(QUERY, query_input)
 
             # Check if row was inserted
             row = cursor.fetchone()
@@ -153,10 +158,11 @@ def get_favorite_quotes():
             # Define query to retrieve list of quotes
             QUERY = f'''SELECT * FROM quotes
                         WHERE quotes.id IN (SELECT quote_id FROM user_quotes_favorited
-                                            WHERE user_id={user_id})'''
+                                            WHERE user_id=%s)'''
             
             # Execute query
-            cursor.execute(QUERY)
+            query_input = (user_id,)
+            cursor.execute(QUERY, query_input)
             rows = cursor.fetchall()
             quotes = construct_quote_list(rows)
 
@@ -166,10 +172,11 @@ def get_favorite_quotes():
 
                 # Define query to retrieve comments from a quote
                 QUERY = f'''SELECT * FROM comments
-                            WHERE user_id={user_id} AND quote_id={quote_id}'''
+                            WHERE user_id=%s AND quote_id=%s'''
 
                 # Execute query
-                cursor.execute(QUERY)
+                query_input = (user_id, quote_id)
+                cursor.execute(QUERY, query_input)
                 rows = cursor.fetchall()
                 comments = construct_comment_json(rows)
                 quote["comments"] = comments
@@ -192,11 +199,12 @@ def remove_favorite_quote():
 
             # Define query to remove quote from user favorites
             QUERY = f'''DELETE FROM user_quotes_favorited
-                        WHERE user_id = {user_id} AND quote_id = {quote_id}
+                        WHERE user_id = %s AND quote_id = %s
                         RETURNING *;'''
 
             # Execute query
-            cursor.execute(QUERY)
+            query_input = (user_id, quote_id)
+            cursor.execute(QUERY, query_input)
             row = cursor.fetchone()
 
     # Form response
@@ -223,10 +231,11 @@ def add_comment():
 
             # Define Query to add comment
             QUERY = f'''INSERT INTO "comments" (content, quote_id, user_id)
-                        VALUES ('{comment_content}', {quote_id}, {user_id});'''
+                        VALUES (%s, %s, %s);'''
 
             # Execute Query
-            cursor.execute(QUERY)
+            data = (comment_content, quote_id, user_id)
+            cursor.execute(QUERY, data)
 
     # Form response
     response = make_response("Created", 201)
@@ -247,12 +256,13 @@ def add_rating():
 
             # Define query to update rating for a quote
             QUERY = f'''INSERT INTO ratings (user_id, quote_id, score)
-                        VALUES ({user_id}, {quote_id}, {rating})
+                        VALUES (%s, %s, %s)
                         ON CONFLICT (user_id, quote_id) DO UPDATE
-                        SET score={rating}'''
+                        SET score=%s'''
 
             # Execute query
-            cursor.execute(QUERY)
+            query_input = (user_id, quote_id, rating, rating)
+            cursor.execute(QUERY, query_input)
 
             # Define query to update quote rating with new average
             QUERY = f'''UPDATE quotes
@@ -283,12 +293,13 @@ def add_tag():
 
             # Define query to add save a tag to the user tags
             QUERY = f'''INSERT INTO user_tags (user_id, tag_name)
-                        VALUES ({user_id}, '{tag}')
+                        VALUES (%s, %s)
                         ON CONFLICT (user_id, tag_name) DO NOTHING
                         RETURNING *'''
 
             # Execute query
-            cursor.execute(QUERY)
+            query_input = (user_id, tag)
+            cursor.execute(QUERY, query_input)
             row = cursor.fetchone()
 
     # Form response
@@ -312,12 +323,12 @@ def get_tags():
             # Define query to retrieve list of quotes
             QUERY = f'''SELECT * FROM tags
                         WHERE name IN (SELECT tag_name FROM user_tags
-                                       WHERE user_id={user_id})'''
+                                       WHERE user_id=%s)'''
             
             # Execute query
-            cursor.execute(QUERY)
+            query_input = (user_id,)
+            cursor.execute(QUERY, query_input)
             rows = cursor.fetchall()
-            print(rows)
             tags = construct_tag_list(rows)
             
     # Form response
@@ -338,11 +349,12 @@ def remove_tag():
 
             # Define query to remove quote from user favorites
             QUERY = f'''DELETE FROM user_tags
-                        WHERE user_id = {user_id} AND tag_name = '{tag}'
+                        WHERE user_id = %s AND tag_name = %s
                         RETURNING *;'''
 
             # Execute query
-            cursor.execute(QUERY)
+            query_input = (user_id, tag)
+            cursor.execute(QUERY, query_input)
             row = cursor.fetchone()
 
     # Form response
