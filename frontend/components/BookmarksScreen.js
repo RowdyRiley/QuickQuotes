@@ -16,7 +16,8 @@ const BookmarksScreen = ({ navigation }) => {
   const [quoteQueue, setQuoteQueue] = useState([]);             // Quotes in quote feed
   const [selectedQuote, setSelectedQuote] = useState(null);     // Expand this quote when pressed
   const [isModalVisible, setIsModalVisible] = useState(false);  // Whether the modal is displayed
-  const [commentText, setCommentText] = useState("");           // Text inside comment box
+  // const [commentText, setCommentText] = useState("");           // Text inside comment box
+  // Test
 
   // Make an API request to get a specific quote
   const getSpecificQuote = async (quote) => {
