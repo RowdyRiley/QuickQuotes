@@ -5,7 +5,7 @@ import { SelectList } from 'react-native-dropdown-select-list';
 import {Modal, Alert} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { RootSiblingParent } from 'react-native-root-siblings';
-import Toast from 'react-native-root-toast';
+import Toast, { ToastContainer } from 'react-native-root-toast';
 import { Rating } from 'react-native-ratings';
 
 // Insert the your server ip and port here
@@ -169,8 +169,8 @@ const QuoteFeed = ({ navigation }) => {
   // Add comment to database and refresh quote
   const handleCommentPress = async () => {
     try {
-      const call1 = await addComment(selectedQuote, commentText);
-      const call2 = await getSpecificQuote(selectedQuote);
+      await addComment(selectedQuote, commentText);
+      await getSpecificQuote(selectedQuote);
     } catch (error) {
       console.log("Error in QuoteFeed handleCommentPress: ", error);
     }
@@ -180,8 +180,8 @@ const QuoteFeed = ({ navigation }) => {
   // Add rating and refresh quote
   const handleRatingPress = async(rating) => {
     try {
-      const call1 = await addRating(selectedQuote, rating);
-      const call2 = await getSpecificQuote(selectedQuote);
+      await addRating(selectedQuote, rating);
+      await getSpecificQuote(selectedQuote);
     } catch(error) {
       console.log("Error in QuoteFeed handleRatingPress: ", error);
     }
@@ -210,7 +210,7 @@ const QuoteFeed = ({ navigation }) => {
     </TouchableOpacity>
   )
 
-  // Display additional info about a quote
+  // Display additional info about a quote in a Modal
   const renderModal = () => {
     if(selectedQuote) {
       return (
@@ -316,6 +316,7 @@ const QuoteFeed = ({ navigation }) => {
           <View style={styles.modal}>
             <View style={QuoteFeedStyles.Modal}>
               <RootSiblingParent>
+                <ToastContainer />
                 {renderModal()}
               </RootSiblingParent>
             </View>
@@ -468,8 +469,8 @@ const SubjectsScreen = ({ navigation }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const call1 = await getSubjectOptions();
-        const call2 = await getUserSubjects();
+        await getSubjectOptions();
+        await getUserSubjects();
       } catch (error) {
         console.log("Error in Subjects Screen useEffect:", error);
       }
@@ -762,28 +763,60 @@ const SettingsScreen = ({ navigation }) => {
   const [notificationPeriod, setNotificationPeriod] = useState("");
 
   const notificationFrequencyOptions = [
-    { key: 1, value: 1 },
-    { key: 2, value: 2 },
-    { key: 3, value: 3 },
-    { key: 4, value: 4 },
-    { key: 5, value: 5 },
-    { key: 6, value: 6 },
-    { key: 7, value: 7 },
-    { key: 8, value: 8 },
-    { key: 9, value: 9 },
-    { key: 10, value: 10 }
+    { value: 1 },
+    { value: 2 },
+    { value: 3 },
+    { value: 4 },
+    { value: 5 },
+    { value: 6 },
+    { value: 7 },
+    { value: 8 },
+    { value: 9 },
+    { value: 10 }
   ];
   const notificationPeriodOptions = [
-    { key: 'hour', value: 'Hour' },
-    { key: 'day', value: 'Day' },
-    { key: 'week', value: 'Week' },
-    { key: 'month', value: 'Month' }
+    { value: 'Hour' },
+    { value: 'Day' },
+    { value: 'Week' },
+    { value: 'Month' }
   ];
 
-  const handleNotificationsPress = () => {
-    setNotificationsModalVisible(true);
-  }
+  // Load notification frequency options when user enters
+  useEffect(() => {
+    // Load frequency
+    AsyncStorage.getItem('notificationFrequency')
+    .then((notificationFrequencyJSON) => {
+      if (notificationFrequencyJSON) {
+        setNotificationFrequency(JSON.parse(notificationFrequencyJSON));
+      }
+    })
 
+    // Load period
+    AsyncStorage.getItem('notificationPeriod')
+    .then((notificationPeriodJSON) => {
+      if (notificationPeriodJSON) {
+        setNotificationPeriod(JSON.parse(notificationPeriodJSON));
+      }
+    })
+  }, [])
+
+  // Store notificationFrequency whenever it changes
+  useEffect(() => {
+    if (notificationFrequency == null) {
+      return;
+    }
+    AsyncStorage.setItem('notificationFrequency', JSON.stringify(notificationFrequency));
+  }, [notificationFrequency])
+
+  // Store notificationPeriod whenever it changes
+  useEffect(() => {
+    if (notificationPeriod == null) {
+      return;
+    }
+    AsyncStorage.setItem('notificationPeriod', JSON.stringify(notificationPeriod));
+  }, [notificationPeriod])
+
+  // Display the 
   const renderNotificationsModal = () => {
     return (
       <View style={styles.modal}>
@@ -834,7 +867,7 @@ const SettingsScreen = ({ navigation }) => {
 
         <View style={styles.SettingsContainer}>
           <View style={styles.RowContainer}>
-            <Pressable style={styles.SettingButton} onPress={() => handleNotificationsPress()}>
+            <Pressable style={styles.SettingButton} onPress={() => setNotificationsModalVisible(true)}>
               <Text style={styles.SettingText}>Notification Frequency</Text>
             </Pressable>
 
@@ -875,10 +908,7 @@ const SettingsScreen = ({ navigation }) => {
         animationType="slide"
         transparent={true}
         visible={notificationsModalVisible}
-        onRequestClose={() => {
-          Alert.alert("Modal has been closed.");
-          setNotificationsModalVisible(false);
-        }}
+        onRequestClose={() => setNotificationsModalVisible(false)}
       >
         {renderNotificationsModal()}
       </Modal>

@@ -6,10 +6,14 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
 import { QuoteFeed, SubjectsScreen, SettingsScreen } from './Screens';
 import { BookmarksScreen } from './components/BookmarksScreen';
+import Toast from 'react-native-root-toast';
 
 const Stack = createStackNavigator();
 
 export default function App() {
+  // Initialize toast notifications
+  // Toast.show('Initializing...', { duration: Toast.durations.SHORT, position: Toast.positions.BOTTOM });
+
   return (
     <NavigationContainer>
       <Stack.Navigator>

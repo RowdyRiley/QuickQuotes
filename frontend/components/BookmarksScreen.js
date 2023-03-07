@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, ScrollView, Pressable, TouchableOpacity, Modal, TextInput } from 'react-native';
 import { RootSiblingParent } from 'react-native-root-siblings';
-import { Toast } from 'react-native-root-toast';
+import Toast, { ToastContainer } from 'react-native-root-toast';
 import { Rating } from 'react-native-ratings';
 
 import { renderQuote } from '../Screens.js'
@@ -128,8 +128,8 @@ const BookmarksScreen = ({ navigation }) => {
   // Add comment to database and refresh quote
   const handleCommentPress = async () => {
     try {
-      const call1 = await addComment(selectedQuote, commentText);
-      const call2 = await getSpecificQuote(selectedQuote);
+      await addComment(selectedQuote, commentText);
+      await getSpecificQuote(selectedQuote);
     } catch (error) {
       console.log("Error in QuoteFeed handleCommentPress: ", error);
     }
@@ -285,6 +285,7 @@ return (
         <View style={BookmarkStyles.ModalBackground}>
           <View style={QuoteFeedStyles.Modal}>
             <RootSiblingParent>
+              <ToastContainer />
               {renderModal()}
             </RootSiblingParent>
           </View>
