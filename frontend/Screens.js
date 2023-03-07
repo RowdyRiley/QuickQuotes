@@ -290,6 +290,7 @@ const QuoteFeed = ({ navigation }) => {
 
         <View style={QuoteFeedStyles.ButtonContainer}>
           <Button
+            // color='#877965'
             color='white'
             title="Give me a quote!"
             onPress={() => getRandomQuote()}
@@ -421,7 +422,7 @@ const QuoteFeedStyles = StyleSheet.create({
   Modal: {
     backgroundColor: "#877965",
     maxHeight: '80%',
-    width: '70%',
+    width: '90%',
     padding: '5%',
     borderRadius: 10,
     alignItems: "center"
@@ -611,8 +612,11 @@ const SubjectsScreen = ({ navigation }) => {
               placeholder="Add new +"
               data={subjectOptions}  
               save="key"  // save the key value of the subject object
-              color="white"
               onSelect={addSubject}
+              boxStyles={{borderColor: 'rgba(0, 0, 0, 0.29)'}}
+              inputStyles={{fontWeight: '300'}}
+              dropdownStyles={{borderColor: 'rgba(0, 0, 0, 0.29)'}}
+              dropdownTextStyles={{fontWeight: '300'}}
             />
           </View>
         </View>
@@ -736,80 +740,199 @@ const SubjectStyles = StyleSheet.create({
     marginRight: '5%',
   },
   titleContainer: {
-    backgroundColor: '#484035',
-    padding: 10,
+    backgroundColor: 'rgba(0, 0, 0, 0.29)',
+    padding: 8,
     borderRadius: 10,
+    alignItems: 'center',
   },
   title2: {
-    fontSize: 12,
+    fontSize: 14,
+    fontWeight: '300',
     color: 'white',
   },
   separator: {
-    height: 10,
+    height: 7,
     backgroundColor: 'transparent',
   },
 });
 
 const SettingsScreen = ({ navigation }) => {
-  const [modalVisible, setModalVisible] = useState(false);
+  const [notificationsModalVisible, setNotificationsModalVisible] = useState(false);
+  const [notificationFrequency, setNotificationFrequency] = useState(null);
+  const [notificationPeriod, setNotificationPeriod] = useState("");
+
+  const notificationFrequencyOptions = [
+    { key: 1, value: 1 },
+    { key: 2, value: 2 },
+    { key: 3, value: 3 },
+    { key: 4, value: 4 },
+    { key: 5, value: 5 },
+    { key: 6, value: 6 },
+    { key: 7, value: 7 },
+    { key: 8, value: 8 },
+    { key: 9, value: 9 },
+    { key: 10, value: 10 }
+  ];
+  const notificationPeriodOptions = [
+    { key: 'hour', value: 'Hour' },
+    { key: 'day', value: 'Day' },
+    { key: 'week', value: 'Week' },
+    { key: 'month', value: 'Month' }
+  ];
+
+  const handleNotificationsPress = () => {
+    setNotificationsModalVisible(true);
+  }
+
+  const renderNotificationsModal = () => {
+    return (
+      <View style={styles.modal}>
+        <View style={styles.modalContent}>
+          <View style={{flexDirection: 'row', height: '85%'}}>
+            <SelectList
+              data={notificationFrequencyOptions}
+              setSelected={(val) => setNotificationFrequency(val)}
+              save="key"
+              search={false}
+              placeholder="Frequency"
+              boxStyles={{borderColor: 'rgba(0, 0, 0, 0.29)'}}
+              inputStyles={{fontWeight: '300'}}
+              dropdownStyles={{borderColor: 'rgba(0, 0, 0, 0.29)'}}
+              dropdownTextStyles={{fontWeight: '300'}}
+            />
+
+            <SelectList
+              data={notificationPeriodOptions}
+              setSelected={(val) => setNotificationPeriod(val)}
+              save="key"
+              search={false}
+              placeholder="Period"
+              boxStyles={{borderColor: 'rgba(0, 0, 0, 0.29)'}}
+              inputStyles={{fontWeight: '300'}}
+              dropdownStyles={{borderColor: 'rgba(0, 0, 0, 0.29)'}}
+              dropdownTextStyles={{fontWeight: '300'}}
+            />
+          </View>
+
+          <Button
+            title="Close"
+            onPress={() => {
+              setNotificationsModalVisible(false);
+            }}
+          />
+        </View>
+      </View>
+    )
+  }
+
   return (
-    <>
-      <View style={QuoteFeedStyles.GreenBackground}>
-        <View style={QuoteFeedStyles.QuoteFeed}>
-          <View style={QuoteFeedStyles.QuoteFeedTitleBackground}>
-            <Text style={QuoteFeedStyles.QuoteFeedTitleText}>Settings</Text>
-          </View>
+    <View style={QuoteFeedStyles.GreenBackground}>
+      <View style={QuoteFeedStyles.QuoteFeed}>
+        <View style={QuoteFeedStyles.QuoteFeedTitleBackground}>
+          <Text style={QuoteFeedStyles.QuoteFeedTitleText}>Settings</Text>
+        </View>
 
-          <View style={styles.notification}>
-            <View style={styles.notificBox} />
-            <Text style={styles.notificText}>Notification</Text>            
-          </View>
+        <View style={styles.SettingsContainer}>
+          <View style={styles.RowContainer}>
+            <Pressable style={styles.SettingButton} onPress={() => handleNotificationsPress()}>
+              <Text style={styles.SettingText}>Notification Frequency</Text>
+            </Pressable>
 
-          <View style={styles.Button}>
-            <View style={styles.buttonbox} />
-            <Button title='Frequency' color='#FFFFFF' onPress={() => setModalVisible(true)} style={styles.buttontext}></Button>            
+            <View style={styles.NotificationBox}>
+              <Text style={styles.SettingText}>
+                {notificationFrequency && notificationPeriod
+                ? `${notificationFrequency} / ${notificationPeriod}`
+                : ""}
+              </Text>            
+            </View>
           </View>
         </View>
 
-        <View style={QuoteFeedStyles.TaskbarBackground}>
-          <Pressable style={QuoteFeedStyles.SubjectsButton} onPress={() => navigation.navigate('Subjects')}>
-            <Text style={QuoteFeedStyles.TaskbarTitleText}>Subjects</Text>
-          </Pressable>
-
-          <Pressable style={QuoteFeedStyles.SettingsButton} onPress={() => navigation.navigate('QuoteFeed')}>
-            <Text style={QuoteFeedStyles.TaskbarTitleText}>QuoteFeed</Text>
+        <View style={styles.RowContainer}>
+          <Pressable style={styles.SettingButton} onPress={() => navigation.navigate('Bookmarks')}>
+              <Text style={styles.SettingText}>Bookmarks</Text>
           </Pressable>
         </View>
+
+        <View style={styles.RowContainer}>
+          <Pressable style={styles.SettingButton}>
+              <Text style={styles.SettingText}>Profile</Text>
+          </Pressable>
+        </View>
+      </View>
+
+      <View style={QuoteFeedStyles.TaskbarBackground}>
+        <Pressable style={QuoteFeedStyles.SubjectsButton} onPress={() => navigation.navigate('Subjects')}>
+          <Text style={QuoteFeedStyles.TaskbarTitleText}>Subjects</Text>
+        </Pressable>
+
+        <Pressable style={QuoteFeedStyles.SettingsButton} onPress={() => navigation.navigate('QuoteFeed')}>
+          <Text style={QuoteFeedStyles.TaskbarTitleText}>QuoteFeed</Text>
+        </Pressable>
       </View>
 
       <Modal
         animationType="slide"
         transparent={true}
-        visible={modalVisible}
+        visible={notificationsModalVisible}
         onRequestClose={() => {
           Alert.alert("Modal has been closed.");
-          setModalVisible(!modalVisible);
+          setNotificationsModalVisible(false);
         }}
       >
-        <View style={styles.modal}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalText}>Option 1</Text>
-            <Text style={styles.modalText}>Option 2</Text>
-            <Text style={styles.modalText}>Option 3</Text>
-            <Button
-              title="Close"
-              onPress={() => {
-                setModalVisible(!modalVisible);
-              }}
-            />
-          </View>
-        </View>
+        {renderNotificationsModal()}
       </Modal>
+
       <StatusBar style="auto" />
-    </>
+    </View>
   );
 };
 const styles = StyleSheet.create({
+  SettingsContainer: {
+    marginTop: '7%'
+  },
+  RowContainer: {
+    flexDirection: 'row',
+    marginBottom: '15%',
+  },
+  SettingButton: {
+    position: 'absolute',
+    width: '60%',
+    height: 40,
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    left: '3%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    
+    backgroundColor: 'rgba(0, 0, 0, 0.29)',
+    shadowColor: 'rgba(0, 0, 0, 0.25)',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 1,
+    shadowRadius: 10,
+    borderRadius: 10,
+  },
+  SettingText: {
+    // fontFamily: 'Abhaya Libre SemiBold',
+    fontWeight: '300',
+    fontSize: 17,
+    color: '#FFFFFF',
+  },
+  NotificationBox: {
+    position: 'absolute',
+    width: '30%',
+    height: 40,
+    right: '3%',
+    alignItems: 'center',
+    justifyContent: 'center',
+
+    backgroundColor: 'rgba(0, 0, 0, 0.29)',
+    shadowColor: 'rgba(0, 0, 0, 0.25)',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 1,
+    shadowRadius: 10,
+    borderRadius: 10,
+  },
   container: {
     flex: 1,
     padding: 20,
@@ -894,49 +1017,12 @@ const styles = StyleSheet.create({
     left: 0,
     top: 30,
   },
-  notificBox: {
-    position: 'absolute',
-    width: 200,
-    height: 40,
-    left: 10,
-    top: 50,
-    backgroundColor: 'rgba(0, 0, 0, 0.29)',
-    shadowColor: 'rgba(0, 0, 0, 0.25)',
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 1,
-    shadowRadius: 10,
-    borderRadius: 10,
-  },
-  notificText: {
-    position: 'absolute',
-    left: 40,
-    top: 45,
-
-    // fontFamily: 'Abhaya Libre SemiBold',
-    fontWeight: '600',
-    fontSize: 25,
-    lineHeight: 50,
-    color: '#FFFFFF',
-  },
   Button: {
     position: 'absolute',
     width: 360,
     height: 100,
     left: 100,
     top: 80,
-  },
-  buttonbox: {
-    position: 'absolute',
-    width: 100,
-    height: 40,
-    left: 130,
-    top: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.29)',
-    shadowColor: 'rgba(0, 0, 0, 0.25)',
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 1,
-    shadowRadius: 10,
-    borderRadius: 10,
   },
   buttontext: {
     position: 'absolute',
@@ -953,11 +1039,13 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)"
+    backgroundColor: "rgba(0, 0, 0, 0.8)"
   },
   modalContent: {
-    backgroundColor: "#fff",
-    padding: 20,
+    backgroundColor: "#877965",
+    height: '50%',
+    width: '75%',
+    padding: '5%',
     borderRadius: 10,
     alignItems: "center"
   },
@@ -969,3 +1057,4 @@ const styles = StyleSheet.create({
 
 
 export { QuoteFeed, SubjectsScreen, SettingsScreen };
+export { QuoteFeedStyles }
