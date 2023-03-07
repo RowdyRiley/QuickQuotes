@@ -893,7 +893,7 @@ const styles = StyleSheet.create({
   },
   RowContainer: {
     flexDirection: 'row',
-    marginBottom: '15%',
+    marginBottom: 45,
   },
   SettingButton: {
     position: 'absolute',
