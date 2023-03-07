@@ -6,7 +6,6 @@ import { Rating } from 'react-native-ratings';
 
 import { renderQuote } from '../Screens.js'
 import { QuoteFeedStyles } from '../Screens.js'
-const constants = require('../utils/globals.js');
 
 // Insert the your server ip and port here
 const URL = "http://192.168.1.197:5000";
@@ -249,14 +248,14 @@ const BookmarksScreen = ({ navigation }) => {
 
   const getBookmarks = async () => {
     try {
-      const response = await fetch(constants.URL + '/get-favorite-quotes', {
+      const response = await fetch(URL + '/get-favorite-quotes', {
         method: 'POST',
         headers: {
           Accept: 'application/json',
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          user_id: constants.user_id
+          user_id: user_id
         })
       });
       const data = await response.json();
