@@ -5,6 +5,7 @@ import { StyleSheet, Text } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
 import { QuoteFeed, SubjectsScreen, SettingsScreen } from './Screens';
+import { BookmarksScreen } from './components/BookmarksScreen';
 
 const Stack = createStackNavigator();
 
@@ -15,6 +16,7 @@ export default function App() {
         <Stack.Screen name="QuoteFeed" component={QuoteFeed} />
         <Stack.Screen name="Subjects" component={SubjectsScreen} />
         <Stack.Screen name="Settings" component={SettingsScreen} />
+        <Stack.Screen name="Bookmarks" component={BookmarksScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   )
