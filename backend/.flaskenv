@@ -1,2 +1,2 @@
-FLASK_APP=app
+FLASK_APP=App
 FLASK_DEBUG=True
