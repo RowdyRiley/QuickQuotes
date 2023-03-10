@@ -3,8 +3,8 @@ from dotenv import load_dotenv
 import psycopg2
 import os
 
-from utils.query_utils import *
-from utils.json_utils import *
+from utils.QueryUtils import *
+from utils.JsonUtils import *
 
 # Define flask app
 app = Flask(__name__)
@@ -93,6 +93,12 @@ def get_specific_quote():
             query_input = (quote_id,)
             cursor.execute(QUERY, query_input)
             row = cursor.fetchone()
+
+            # Check if any data was returned
+            if row is None:
+                return make_response("No quotes found", 204)
+
+            # Turn quote into json format
             quote = construct_quote_json(row)
 
             # Define Query to get comments associated with the quote
@@ -134,14 +140,12 @@ def favorite_quote():
 
             # Check if row was inserted
             row = cursor.fetchone()
+            if row is None:
+                return make_response("Already exists", 200)
+
 
     # Form response
-    if row is None:
-        # Row already exists
-        response = make_response("Already exists", 200)
-    else:
-        # Row was inserted
-        response = make_response("Created", 201)
+    response = make_response("Created", 201)
     return response
 
 # Return a list of quotes favorited by user
@@ -164,6 +168,12 @@ def get_favorite_quotes():
             query_input = (user_id,)
             cursor.execute(QUERY, query_input)
             rows = cursor.fetchall()
+
+            # Check if any data was returned
+            if rows is None:
+                return make_response("No quotes found", 204)
+
+            # Form list of quotes in json format
             quotes = construct_quote_list(rows)
 
             # Retrieve comments for each quote
@@ -206,14 +216,13 @@ def remove_favorite_quote():
             query_input = (user_id, quote_id)
             cursor.execute(QUERY, query_input)
             row = cursor.fetchone()
+            
+            # Check if any data was returned
+            if row is None:
+                return make_response("No content", 204)
 
     # Form response
-    if row is None:
-        # Row doesn't exist
-        response = make_response("No content", 204)
-    else:
-        # Row was deleted
-        response = make_response("OK", 200)
+    response = make_response("OK", 200)
     return response
 
 # Post comment
@@ -302,11 +311,12 @@ def add_tag():
             cursor.execute(QUERY, query_input)
             row = cursor.fetchone()
 
+            # Check if any data was returned
+            if row is None:
+                return make_response("Already exists", 200)
+
     # Form response
-    if row is None:
-        response = make_response("Already exists", 200)
-    else:
-        response = make_response("Created", 201)
+    response = make_response("Created", 201)
     return response
 
 # Get all saved tags for user
@@ -329,6 +339,12 @@ def get_tags():
             query_input = (user_id,)
             cursor.execute(QUERY, query_input)
             rows = cursor.fetchall()
+
+            # Check if any data was returned
+            if rows is None:
+                return make_response("No tags found", 204)
+
+            # Form list of tags in json format
             tags = construct_tag_list(rows)
             
     # Form response
@@ -357,11 +373,12 @@ def remove_tag():
             cursor.execute(QUERY, query_input)
             row = cursor.fetchone()
 
+            # Check if any data was returned
+            if row is None:
+                return make_response("No quotes found", 204)
+
     # Form response
-    if row is None:
-        response = make_response("No content", 204)
-    else:
-        response = make_response("OK", 200)
+    response = make_response("OK", 200)
     return response
 
 @app.get("/get-all-tags")
@@ -376,6 +393,12 @@ def get_all_tags():
             # Execute query
             cursor.execute(QUERY)
             rows = cursor.fetchall()
+
+            # Check if any data was returned
+            if rows is None:
+                return make_response("No tags found", 204)
+
+            # Form list of tags in json format
             tags = construct_tag_list(rows)
             
     # Form response
