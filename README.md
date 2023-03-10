@@ -4,9 +4,10 @@ CSE 115 Group Project
 Instructions on setting up the app:  
 Navigate to frontend folder  
 Install packages: ```npm install```  
-Navigate to screens.js  
+Navigate to config.js  
 Change the URL to the host and port that you are running your server on  
-Run app: ```expo start```
+Run app: ```expo start```  
+If on Windows: ```Set-ExecutionPolicy Unrestricted -Scope Process``` then: ```expo start```  
 
 Instructions on setting up the server:  
 Navigate to backend folder  
@@ -18,11 +19,7 @@ Install requirements: ```pip install -r ./requirements.txt```
 .env contains environment variables indicating the database URL, retrieved using load_dotenv() from dotenv.    
 
 Run server: ```flask run -h {host} -p {port}```  
-Use the host displayed on expo start, any port such as 5000
-Refer to README.txt in backend folder for more details.
+Use your ip and select any port, such as 5000. If you do not know your ip, use the address displayed on expo start.  
 
-Run webscraper: python3 webscraper.py  
-Note on csv files:  
-Csv file will be created in csv folder.  
-Each row contains quote followed by author, separated by a comma.  
-If the quote contains a comma, it will be enclosed in an additional set of quotations.
+Run webscraper: ```python3 webscraper.py```  
+csv file will be created in csv folder.
