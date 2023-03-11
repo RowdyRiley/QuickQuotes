@@ -1,0 +1,154 @@
+POST /get-quote  
+Expects a json {"user_id": (int)}  
+Returns a json {  
+    "quote_id": (int),  
+    "quote_content": (string),  
+    "author": (string),  
+    "tag": (string),  
+    "rating": (float),  
+    "comments": list of json {  
+        "user_id": (int),
+        "comment_content: (string)
+    }
+}
+Fetches a random quote that hasn't been seen by the user, 
+fetches comments associated with the quote, marks the quote as seen 
+by the user, and returns the the quote in a json.
+200: OK
+204: No quotes found
+
+
+
+POST /get-specific-quote  
+Expects a json {"quote_id": (int)}  
+Returns a json {  
+    "quote_id": (int),  
+    "quote_content": (string),  
+    "author": (string),  
+    "tag": (string),  
+    "rating": (double),  
+    "comments": list of json {  
+        "user_id": (int),
+        "comment_content: (string)  
+    }  
+}
+Fetches a quote with quote_id, fetches comments associated with the
+quote, and returns the quote in a json.
+200: OK
+204: No quote found
+
+
+
+PUT /add-favorite  
+Expects a json {  
+    "user_id": (int),  
+    "quote_id": (int)  
+}  
+Associates a quote with the user as favorited. If it is already 
+favorited by the user, does nothing.
+200: OK
+201: Already favorited
+
+
+
+POST /get-favorite-quotes  
+Expects a json {"user_id": (int)}  
+Returns an array[] of json {  
+    "quote_id": (int),  
+    "quote_content": (string),  
+    "author": (string),  
+    "tag": (string),  
+    "rating": (double),  
+    "comments": list of json {  
+        "user_id": (int),  
+        "comment_content: (string)  
+    }  
+}
+Fetches all quotes that have been favorited by the user, fetches
+comments associated for each quote, bundle each quote into a json, 
+and returns all of the quotes in an array.
+200: OK
+204: No quotes found
+
+
+
+DELETE /remove-favorite  
+Expects a json {  
+    "user_id": (int),  
+    "quote_id": (int)  
+}  
+Removes the quote from list of quotes favorited by the user.
+200: OK
+204: Quote not found in user's favorites
+
+
+
+POST /add-comment  
+Expects a json {  
+    "user_id": (int),  
+    "quote_id": (int),  
+    "comment_content": (string)  
+}  
+Adds a comment associated with the quote.
+201: Created
+
+
+
+PUT /modify-rating  
+Expects a json {  
+    "user_id": (int),  
+    "quote_id": (int),  
+    "rating": (int)  
+}  
+Adds a rating associated with the quote. If there is already a 
+rating associated with the quote, replaces the old rating with 
+the new. Then updates the quote's average rating.
+200: OK
+
+
+
+PUT /add-tag  
+Expects a json {  
+    "user_id": (int),  
+    "tag": (string)  
+}  
+Associates the user with a tag. If the user is already associated 
+with the tag, does nothing.
+200: User is already associated with the tag.
+201: Created
+
+
+
+POST /get-tags  
+Expects a json {"user_id": (int)}  
+Returns an array[] of json {
+    "key": (int),
+    "value": (string)
+}  
+Fetches all tags associated with the user, bundles each into a json
+with the tag id and name, and returns them in an array.
+200: OK
+204: No tags found
+
+
+
+DELETE /remove-tag
+Expects a json {  
+    "user_id": (int)  
+    "tag": (string)  
+}  
+Removes the tag from list of tags associated with the user.
+200: OK
+204: Tag not found in user's list of tags
+
+
+
+GET /get-all-tags
+Returns an array[] of json {
+    "key": (int),
+    "value": (string)
+}
+Fetches all the available tags, bundles each into a json with the 
+tag id and name, and returns them in an array.
+200: OK
+204: No tags found
