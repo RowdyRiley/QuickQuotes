@@ -1,8 +1,5 @@
-/venv/
-__pycache__
 /backend/venv/
 /backend/__pycache__
-/.expo/
-/node_modules/
+/backend/utils/__pycache__
 /frontend/.expo/
 /frontend/node_modules/
