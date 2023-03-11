@@ -7,9 +7,11 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { RootSiblingParent } from 'react-native-root-siblings';
 import Toast, { ToastContainer } from 'react-native-root-toast';
 import { Rating } from 'react-native-ratings';
+import {Clipboard} from 'react-native';
+
 
 // Insert the your server ip and port here
-const URL = "http://192.168.1.197:5000";
+const URL = "http://192.168.1.185:5000";
 const user_id = 1;
 
 const QuoteFeed = ({ navigation }) => {
@@ -266,6 +268,9 @@ const QuoteFeed = ({ navigation }) => {
           </Pressable>
           <Pressable style={QuoteFeedStyles.ModalButton} onPress={() => bookmarkQuote(selectedQuote)}>
             <Text style={QuoteFeedStyles.ModalButtonText}>Bookmark</Text>
+          </Pressable>
+          <Pressable style={QuoteFeedStyles.ModalButton} onPress={() => Clipboard.setString("Check out this quote from the Quick Quotes app!:\n\n" + selectedQuote.quote_content + "\n\n-" + selectedQuote.author)}>
+            <Text style={QuoteFeedStyles.ModalButtonText}>Share</Text>
           </Pressable>
           <Pressable style={QuoteFeedStyles.ModalButton} onPress={() => closeModal()}>
             <Text style={QuoteFeedStyles.ModalButtonText}>Close</Text>
