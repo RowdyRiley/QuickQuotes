@@ -1,7 +1,8 @@
 import React, {useState, useEffect} from 'react';
 import { View, Text, Button, ScrollView, Pressable } from 'react-native';
 import { Modal } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+//import AsyncStorage from '@react-native-async-storage/async-storage';
+import { AsyncStorage } from 'react-native';
 import { ToastContainer } from 'react-native-root-toast';
 
 import QuoteFeedStyles from '../styles/QuoteFeedStyles';
@@ -60,7 +61,7 @@ export const QuoteFeedScreen = ({ navigation }) => {
           <Text style={QuoteFeedStyles.QuoteFeedTitleText}>Quote Feed</Text>
         </View>
 
-        <ScrollView style={QuoteFeedStyles.Scroll}>
+        <ScrollView style={QuoteFeedStyles.Scroll} testID="quotes-scrollview">
           {quoteQueue.map((quote) => (
             <React.Fragment key={quote.quote_id}>
               {RenderQuote(quote, handleQuotePress)}

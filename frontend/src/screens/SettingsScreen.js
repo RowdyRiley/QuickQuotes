@@ -2,7 +2,8 @@ import { StatusBar } from 'expo-status-bar';
 import React, {useState, useEffect} from 'react';
 import { View, Text, Pressable } from 'react-native';
 import { Modal } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+//import AsyncStorage from '@react-native-async-storage/async-storage';
+import { AsyncStorage } from 'react-native';
 
 import QuoteFeedStyles from '../styles/QuoteFeedStyles';
 import SettingStyles from '../styles/SettingStyles';
