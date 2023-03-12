@@ -1,18 +1,8 @@
-// installed the renderer and library using --legacy-peer-deps
-
-// ie. npx expo install @testing-library/react-native -- --save-dev --legacy-peer-deps
-
-// ie. sudo npm install --save-dev react-test-renderer@^18.1.0 --legacy-peer-deps
-
-// sudo npm install @react-navigation/native --legacy-peer-deps?? is this needed...
-
-// npm i --save react-native-safe-area-context@4.4.1
-
-
 import React from 'react';
 import renderer from 'react-test-renderer';
 //import AsyncStorage from '@react-native-async-storage/async-storage';
 import { render, screen, fireEvent } from "@testing-library/react-native";
+import { act } from 'react-test-renderer';
 
 import App from '../App';
 
@@ -47,50 +37,74 @@ describe('QuoteFeed', () => {
 
     it('Settings Button Navigation', () => {
         render(<App />);
-        fireEvent.press(screen.getByText("Settings"));
+        act(() => {
+            fireEvent.press(screen.getByText("Settings"));
+        });    
         expect(screen.queryAllByText("Notification Frequency").length).toBe(1);
     });
 
     it('Subjects Button Navigation', () => {
         render(<App />);
-        fireEvent.press(screen.getByText("Subjects"));
+        act(() => {
+            fireEvent.press(screen.getByText("Subjects"));
+        });   
         expect(screen.queryAllByText("Add new +").length).toBe(1);
     });
 
     it('To Subjects then Back to QuoteFeed', () => {
         render(<App />);
-        fireEvent.press(screen.getByText("Subjects"));
+        act(() => {
+            fireEvent.press(screen.getByText("Subjects"));
+        });
         let a = screen.queryAllByText("QuoteFeed");
-        fireEvent.press(a[0]);
+        act(() => {
+            fireEvent.press(a[0]);
+        });
         expect(screen.queryAllByText("Quote Feed").length).toBe(1);
     });
 
     it('To Settings then Back to QuoteFeed', () => {
         render(<App />);
-        fireEvent.press(screen.getByText("Settings"));
+        act(() => {
+            fireEvent.press(screen.getByText("Settings"));
+        });
         //fireEvent.press(screen.getByText("Settings"));
         let a = screen.queryAllByText("QuoteFeed");
-        fireEvent.press(a[0]);
+        act(() => {
+            fireEvent.press(a[0]);
+        });
         expect(screen.queryAllByText("Quote Feed").length).toBe(1);
     });
 
     it('To Subjects then to Settings Then Back to QuoteFeed', () => {
         render(<App />);
-        fireEvent.press(screen.getByText("Subjects"));
+        act(() => {
+            fireEvent.press(screen.getByText("Subjects"));
+        });
         let a = screen.queryAllByText("Settings");
-        fireEvent.press(a[0]);
+        act(() => {
+            fireEvent.press(a[0]);
+        });
         let b = screen.queryAllByText("QuoteFeed");
-        fireEvent.press(b[0]);
+        act(() => {
+            fireEvent.press(b[0]);
+        });
         expect(screen.queryAllByText("Quote Feed").length).toBe(1);
     });
 
     it('To Settings then to Subjects Then Back to QuoteFeed', () => {
         render(<App />);
-        fireEvent.press(screen.getByText("Settings"));
+        act(() => {
+            fireEvent.press(screen.getByText("Settings"));
+        });
         let a = screen.queryAllByText("Subjects");
-        fireEvent.press(a[0]);
+        act(() => {
+            fireEvent.press(a[0]);
+        });
         let b = screen.queryAllByText("QuoteFeed");
-        fireEvent.press(b[0]);
+        act(() => {
+            fireEvent.press(b[0]);
+        });
         expect(screen.queryAllByText("Quote Feed").length).toBe(1);
     });
 
@@ -108,15 +122,18 @@ describe('QuoteFeed', () => {
     //     expect(textComponents).toHaveLength(1); // assuming it starts at 0
     // });
 
-    it('Subjects', () => {                  ////// could add a reset button to clear feed, which helps with testing, sets count to 0.
+    it('Subjects', () => {                  // could add a reset button to clear feed, which helps with testing, sets count to 0.
         render(<App />);
-        fireEvent.press(screen.getByText("Subjects"));
+        act(() => {
+            fireEvent.press(screen.getByText("Settings"));
+        });
+        act(() => {
+            fireEvent.press(screen.getByText("Notification Frequency"));
+        });
         //expect(screen.queryAllByText("Add new +").length).toBe(1);
-       // expect(screen.queryAllByText("astrophysics").length).toBe(1);
+        expect(screen.queryAllByText("1").length).toBe(1);
     });
-    // let newCount = Number(
-    //     screen.getByLabelText('count for Second Molly Channel').children[0],
-    //   );
+    // let newCount = Number( screen.getByLabelText('').children[0],//   );
   });
 
 
