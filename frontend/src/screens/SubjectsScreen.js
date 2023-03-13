@@ -91,6 +91,7 @@ export const SubjectsScreen = ({ navigation }) => {
 
           <View style={SubjectStyles.slist}>
             <SelectList 
+              testId="select"
               setSelected={(val) => setSelectedSubjectKey(val)} 
               style={{backgroundColor: '#605647', color: 'white'}} 
               placeholder="Add new +"
