@@ -82,6 +82,12 @@ export const SettingsScreen = ({ navigation }) => {
               <Text style={SettingStyles.SettingText}>Profile</Text>
           </Pressable>
         </View>
+
+        <View style={SettingStyles.RowContainer}>
+          <Pressable style={SettingStyles.SettingButton} onPress={() => navigation.navigate('Login')}>
+              <Text style={SettingStyles.SettingText}>Back to Home Screen</Text>
+          </Pressable>
+        </View>
       </View>
 
       <View style={QuoteFeedStyles.TaskbarBackground}>
