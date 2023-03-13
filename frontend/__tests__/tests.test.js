@@ -1,7 +1,7 @@
 import React from 'react';
 import renderer from 'react-test-renderer';
 //import AsyncStorage from '@react-native-async-storage/async-storage';
-import { render, screen, fireEvent } from "@testing-library/react-native";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react-native";
 import { act } from 'react-test-renderer';
 
 import App from '../App';
@@ -13,7 +13,7 @@ import App from '../App';
 //   });
 // });
 
-describe('QuoteFeed', () => {
+describe('Navigation', () => {
     it('Title', () => {
         render(<App />);
         expect(screen.queryAllByText("Quote Feed").length).toBe(1);
@@ -107,7 +107,9 @@ describe('QuoteFeed', () => {
         });
         expect(screen.queryAllByText("Quote Feed").length).toBe(1);
     });
+});
 
+describe('QuoteFeed', () => {
     it('Give Me a Quote Button Exists', () => {
         render(<App />);
         expect(screen.queryAllByText("Give me a quote!").length).toBe(1);
@@ -122,19 +124,65 @@ describe('QuoteFeed', () => {
     //     expect(textComponents).toHaveLength(1); // assuming it starts at 0
     // });
 
-    it('Subjects', () => {                  // could add a reset button to clear feed, which helps with testing, sets count to 0.
-        render(<App />);
-        act(() => {
-            fireEvent.press(screen.getByText("Settings"));
-        });
-        act(() => {
-            fireEvent.press(screen.getByText("Notification Frequency"));
-        });
-        //expect(screen.queryAllByText("Add new +").length).toBe(1);
-        expect(screen.queryAllByText("1").length).toBe(1);
-    });
+    // it('Subjects', () => {                 
+    //     render(<App />);
+    //     act(() => {
+    //         fireEvent.press(screen.getByText("Settings"));
+    //     });
+    //     act(() => {
+    //         fireEvent.press(screen.getByText("Notification Frequency"));
+    //     });
+    //     //expect(screen.queryAllByText("Add new +").length).toBe(1);
+    //     expect(screen.queryAllByText("1").length).toBe(1);
+    // });
     // let newCount = Number( screen.getByLabelText('').children[0],//   );
-  });
+});
+
+describe('Subjects', () => {
+    it('Subjects', () => {                 
+        render(<App />);
+
+        act(() => {
+            fireEvent.press(screen.getByText("Subjects"));
+        });
+        expect(screen.queryAllByText("Add new +").length).toBe(1);
+    });
+
+    it('Subjects fetch ', () => {                  
+        render(<App />);
+
+        act(() => {
+            fireEvent.press(screen.getByText("Subjects"));
+        });
+        //await findByText('anatomy');
+        // Find the dropdown list and click it to open options
+        const dropdown = screen.findByTestId('select');
+        fireEvent.press(dropdown);
+        // Assert that 'anatomy' is visible in the dropdown options
+        const anatomyOption = screen.findByText('anatomy');
+        expect(anatomyOption).toBeVisible();
+    });
+
+    it('Fetches Data', async () => {                  
+        render(<App />);
+      
+        act(() => {
+          fireEvent.press(screen.getByText("Subjects"));
+        });
+      
+        await waitFor(() => {
+          expect(screen.getByText('Add new +')).toBeTruthy();
+        });
+      
+        const dropdown = await screen.findByTestId('select');
+        await act(async () => {
+          fireEvent.press(dropdown);
+        });
+        const anatomyOption = await screen.findByText('anatomy');
+        expect(anatomyOption).toBeVisible();
+    });
+      
+});
 
 
 
@@ -159,36 +207,22 @@ describe('QuoteFeed', () => {
 
 // ie. sudo npm install --save-dev react-test-renderer@^18.1.0 --legacy-peer-deps
 
-// sudo npm install @react-navigation/native --legacy-peer-deps?? is this needed...
+// sudo npm install @react-navigation/native --legacy-peer-deps (don't think this is needed)
 
 // npm i --save react-native-safe-area-context@4.4.1
 
-
 // "scripts": {
-
 //     ...
-
 //     "test": "jest"
-
 //   },
-
 //   "jest": {
-
 //     "preset": "jest-expo"
-
 //   }
-
 
 // sudo npx expo install jest-expo jest -- --legacy-peer-deps
 
-
-//https://stackoverflow.com/questions/70080213/syntaxerror-node-modules-react-native-libraries-polyfills-error-guard-js-miss
-
-  
-
+//https://stackoverflow.com/questions/70080213/syntaxerror-node-modules-react-native-libraries-polyfills-error-guard-js-miss (don't think this is needed)
 
 // also changed the async import from screens to: import AsyncStorage from '@react-native-async-storage/async-storage'
-
- //Need index.js?
 
 
