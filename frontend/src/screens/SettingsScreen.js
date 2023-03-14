@@ -10,12 +10,13 @@ import SettingStyles from '../styles/SettingStyles';
 import RenderNotificationsModal from '../components/RenderNotificationsModal';
 import auth from '../../firebase.js';
 import UserContext from '../utils/UserContext';
+import { addUserToDatabase } from '../utils/Api';
 
 export const SettingsScreen = ({ navigation }) => {
   const [notificationsModalVisible, setNotificationsModalVisible] = useState(false);
   const [notificationFrequency, setNotificationFrequency] = useState(null);
   const [notificationPeriod, setNotificationPeriod] = useState("");
-  const { setUserId } = useContext(UserContext);
+  const { userId, setUserId } = useContext(UserContext);
 
   // Load notification frequency options when user enters
   useEffect(() => {
@@ -52,12 +53,28 @@ export const SettingsScreen = ({ navigation }) => {
     AsyncStorage.setItem('notificationPeriod', JSON.stringify(notificationPeriod));
   }, [notificationPeriod])
 
-  const handleAnonymousSignIn = () => {
-    signInAnonymously(auth)
+  // When the user presses the Login button, log them in as an anonymous user
+  const handleAnonymousSignIn = async () => {
+    // Check if user is already logged in
+    if (userId != 1) {
+      var toastMsg = "Already logged in!";
+    } else {
+      var toastMsg = "Logged in as anonymous user.";
+    }
+
+    // Log the user in as an anonymous user
+    await signInAnonymously(auth)
       .then((userCredential) => {
         const user = userCredential.user;
+
+        // Set context
         setUserId(user.uid);
-        Toast.show('Logged in as anonymous user.', {
+
+        // Add the user to the database if not already in there
+        addUserToDatabase(user.uid);
+
+        // Display toast notification
+        Toast.show(toastMsg, {
           duration: Toast.durations.SHORT,
           position: Toast.positions.CENTER,
         });
