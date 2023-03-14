@@ -9,7 +9,7 @@ Start virtual environment if on Mac/Linux: ```. venv/bin/activate```
 If on Windows: ```Set-ExecutionPolicy Unrestricted -Scope Process``` then: ```. venv/Scripts/activate```  
 Install requirements: ```pip install -r ./requirements.txt```  
 Run server: ```flask run -h {host} -p {port}```  
-Use your ip and select any port, such as port. If you do not know your ip, use the address displayed on expo start.  
+Use your ip and select any port, such as port. If you do not know your ip, use the address displayed on expo start or use ipconfig.  
 
 Instructions on setting up the app:  
 Navigate to frontend/  
