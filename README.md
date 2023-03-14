@@ -27,3 +27,4 @@ csv file will be created in csv folder.
 Instructions on setting up the tests:
 Navigate to frontend folder
 Install packages: ```npx expo install jest-expo jest -- --legacy-peer-deps```
+Run tests: ```npm run test```
