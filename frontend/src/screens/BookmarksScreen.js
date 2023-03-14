@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, ScrollView, Modal } from 'react-native';
 import { ToastContainer } from 'react-native-root-toast';
 
@@ -7,17 +7,19 @@ import BookmarkStyles from '../styles/BookmarkStyles';
 import RenderQuote from '../components/RenderQuote'
 import RenderQuoteModal from '../components/RenderQuoteModal'
 import * as Api from '../utils/Api';
+import UserContext from '../utils/UserContext';
 
 // Display all of the user's bookmarked quotes
 const BookmarksScreen = ({ navigation }) => {
   const [quoteList, setQuoteList] = useState([]);               // List of bookmarked quotes
   const [selectedQuote, setSelectedQuote] = useState(null);     // Expand this quote when pressed
   const [isModalVisible, setIsModalVisible] = useState(false);  // Whether the modal is displayed
+  const { userId } = useContext(UserContext);
 
-  //
+  // Load all user bookmarks when page is loaded
   useEffect(() => {
     const setBookmarks = async () => {
-      const newList = await Api.getBookmarks();
+      const newList = await Api.getBookmarks(userId);
       setQuoteList(newList);
     }
     setBookmarks();
