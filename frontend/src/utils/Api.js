@@ -192,3 +192,22 @@ export const removeSubjectFromDatabase = async (user_id, subject) => {
     console.log("Error in removeSubjectFromDatabase:", error);
   }
 }
+
+// Make an API request to add a subject to list of user's saved subjects
+export const addUserToDatabase = async (user_id) => {
+  try {
+    const response = await fetch(URL + '/add-user', {
+      method: 'PUT',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        user_id: user_id
+      })
+    });
+    return response;
+  } catch (error) {
+    console.log("Error in addUserToDatabase:", error);
+  }
+};

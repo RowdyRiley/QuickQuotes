@@ -404,3 +404,33 @@ def get_all_tags():
     # Form response
     response = make_response(tags, 200)
     return response
+
+# Add a user to the database
+@app.put("/add-user")
+def add_user():
+
+    # Request data from the frontend as a json
+    data = request.get_json()
+    user_id = data["user_id"]
+
+    with conn:
+        with conn.cursor() as cursor:
+
+            # Define query to add save a tag to the user tags
+            QUERY = f'''INSERT INTO users (user_id)
+                        VALUES (%s)
+                        ON CONFLICT (user_id) DO NOTHING
+                        RETURNING *;'''
+
+            # Execute query
+            query_input = (user_id,)
+            cursor.execute(QUERY, query_input)
+            row = cursor.fetchone()
+
+            # Check if any data was returned
+            if row is None:
+                return make_response("Already exists", 200)
+
+    # Form response
+    response = make_response("Created", 201)
+    return response
