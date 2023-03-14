@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, Button, ScrollView, Pressable } from 'react-native';
 import { Modal } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -8,12 +8,14 @@ import QuoteFeedStyles from '../styles/QuoteFeedStyles';
 import * as Api from '../utils/Api';
 import RenderQuoteModal from '../components/RenderQuoteModal';
 import RenderQuote from '../components/RenderQuote';
+import UserContext from '../utils/UserContext';
 
 // Display the 15 most recent quotes in a feed
 export const QuoteFeedScreen = ({ navigation }) => {
   const [quoteQueue, setQuoteQueue] = useState([]);             // Quotes in quote feed
   const [selectedQuote, setSelectedQuote] = useState(null);     // Expand this quote when pressed
   const [isModalVisible, setIsModalVisible] = useState(false);  // Whether the modal is displayed
+  const { userId } = useContext(UserContext);
 
   // Display the saved quote feed when app is launched
   useEffect(() => {
@@ -35,7 +37,7 @@ export const QuoteFeedScreen = ({ navigation }) => {
 
   // When a user presses on the get quote button, fetch a quote and store it in a queue
   const handleGetQuote = async () => {
-    const newQuote = await Api.getRandomQuote();
+    const newQuote = await Api.getRandomQuote(userId);
     if (newQuote) {
       setQuoteQueue((prevQueue) => [newQuote, ...prevQueue.slice(0, 14)]);
     }
@@ -71,8 +73,7 @@ export const QuoteFeedScreen = ({ navigation }) => {
 
       <View style={QuoteFeedStyles.ButtonContainer}>
         <Button
-          // color='#877965'
-          color='white'
+          color='#877965'
           title="Give me a quote!"
           onPress={() => handleGetQuote()}
         />

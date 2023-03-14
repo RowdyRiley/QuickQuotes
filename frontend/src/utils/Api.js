@@ -1,8 +1,7 @@
 const { URL } = require("../../config.js");
-const user_id = 1;
 
 // Make an API request to get a random quote
-export const getRandomQuote = async () => {
+export const getRandomQuote = async (user_id) => {
   const response = await fetch(URL + '/get-quote', {
     method: 'POST',
     headers: {
@@ -22,7 +21,7 @@ export const getRandomQuote = async () => {
 };
 
 // Make an API request to get a specific quote
-export const getSpecificQuote = async (quote) => {
+export const getSpecificQuote = async (user_id, quote) => {
   const response = await fetch(URL + '/get-specific-quote', {
     method: 'POST',
     headers: {
@@ -42,7 +41,7 @@ export const getSpecificQuote = async (quote) => {
 };
 
 // Make an API request to add quote to user's bookmarks
-export const bookmarkQuote = async (quote) => {
+export const bookmarkQuote = async (user_id, quote) => {
   try {
     const response = await fetch(URL + '/add-favorite', {
       method: 'PUT',
@@ -62,7 +61,7 @@ export const bookmarkQuote = async (quote) => {
 };
 
 // Make an API request to add a comment to the quote
-export const addComment = async (quote, comment) => {
+export const addComment = async (user_id, quote, comment) => {
   try {
     const response = await fetch(URL + '/add-comment', {
       method: 'POST',
@@ -83,7 +82,7 @@ export const addComment = async (quote, comment) => {
 }
 
 // Make an API request to add a rating to the quote
-export const addRating = async (quote, rating) => {
+export const addRating = async (user_id, quote, rating) => {
   try {
     const response = await fetch(URL + '/modify-rating', {
       method: 'PUT',
@@ -104,7 +103,7 @@ export const addRating = async (quote, rating) => {
 }
 
 // Make an API request to get user's list of bookmarks
-export const getBookmarks = async () => {
+export const getBookmarks = async (user_id) => {
   try {
     const response = await fetch(URL + '/get-favorite-quotes', {
       method: 'POST',
@@ -124,7 +123,7 @@ export const getBookmarks = async () => {
 }
 
 // Make an API request to get list of available subject options
-export const getSubjectOptions = async () => {
+export const getSubjectOptions = async (user_id) => {
   try {
     const response = await fetch(URL + '/get-all-tags');
     const data = await response.json();
@@ -135,7 +134,7 @@ export const getSubjectOptions = async () => {
 }
 
 // Make an API request to get list of user's saved subjects
-export const getUserSubjects = async () => {
+export const getUserSubjects = async (user_id) => {
   try {
     const response = await fetch(URL + '/get-tags', {
       method: 'POST',
@@ -155,7 +154,7 @@ export const getUserSubjects = async () => {
 };
 
 // Make an API request to add a subject to list of user's saved subjects
-export const addSubjectToDatabase = async (subject) => {
+export const addSubjectToDatabase = async (user_id, subject) => {
   try {
     const response = await fetch(URL + '/add-tag', {
       method: 'PUT',
@@ -175,7 +174,7 @@ export const addSubjectToDatabase = async (subject) => {
 };
 
 // Make an API request to remove a subject from list of user's saved subjects
-export const removeSubjectFromDatabase = async (subject) => {
+export const removeSubjectFromDatabase = async (user_id, subject) => {
   try {
     const response = await fetch(URL + '/remove-tag', {
       method: 'DELETE',

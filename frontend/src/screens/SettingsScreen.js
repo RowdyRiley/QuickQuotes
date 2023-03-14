@@ -1,17 +1,21 @@
 import { StatusBar } from 'expo-status-bar';
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, Pressable } from 'react-native';
 import { Modal } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { signInAnonymously } from 'firebase/auth';
 
 import QuoteFeedStyles from '../styles/QuoteFeedStyles';
 import SettingStyles from '../styles/SettingStyles';
 import RenderNotificationsModal from '../components/RenderNotificationsModal';
+import auth from '../../firebase.js';
+import UserContext from '../utils/UserContext';
 
 export const SettingsScreen = ({ navigation }) => {
   const [notificationsModalVisible, setNotificationsModalVisible] = useState(false);
   const [notificationFrequency, setNotificationFrequency] = useState(null);
   const [notificationPeriod, setNotificationPeriod] = useState("");
+  const { setUserId } = useContext(UserContext);
 
   // Load notification frequency options when user enters
   useEffect(() => {
@@ -48,6 +52,20 @@ export const SettingsScreen = ({ navigation }) => {
     AsyncStorage.setItem('notificationPeriod', JSON.stringify(notificationPeriod));
   }, [notificationPeriod])
 
+  const handleAnonymousSignIn = () => {
+    signInAnonymously(auth)
+      .then((userCredential) => {
+        const user = userCredential.user;
+        console.log(user.uid);
+        setUserId(user.uid);
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        console.error("Anonymous sign-in failed:", errorCode, errorMessage);
+      });
+  };
+
   return (
     <View style={QuoteFeedStyles.GreenBackground}>
       <View style={QuoteFeedStyles.QuoteFeed}>
@@ -55,7 +73,8 @@ export const SettingsScreen = ({ navigation }) => {
           <Text style={QuoteFeedStyles.QuoteFeedTitleText}>Settings</Text>
         </View>
 
-        <View style={SettingStyles.SettingsContainer}>
+        {/* Notification Frequency Options; leave out until feature implemented */}
+        {/* <View style={SettingStyles.SettingsContainer}>
           <View style={SettingStyles.RowContainer}>
             <Pressable style={SettingStyles.SettingButton} onPress={() => setNotificationsModalVisible(true)}>
               <Text style={SettingStyles.SettingText}>Notification Frequency</Text>
@@ -69,16 +88,16 @@ export const SettingsScreen = ({ navigation }) => {
               </Text>            
             </View>
           </View>
-        </View>
+        </View> */}
 
-        <View style={SettingStyles.RowContainer}>
+        <View style={[SettingStyles.RowContainer, {marginTop: '7%'}]}>
           <Pressable style={SettingStyles.SettingButton} onPress={() => navigation.navigate('Bookmarks')}>
               <Text style={SettingStyles.SettingText}>Bookmarks</Text>
           </Pressable>
         </View>
 
         <View style={SettingStyles.RowContainer}>
-          <Pressable style={SettingStyles.SettingButton}>
+          <Pressable style={SettingStyles.SettingButton} onPress={handleAnonymousSignIn}>
               <Text style={SettingStyles.SettingText}>Profile</Text>
           </Pressable>
         </View>
