@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, ScrollView, Pressable, TextInput, Clipboard } from 'react-native';
 import Toast from 'react-native-root-toast';
 import { Rating } from 'react-native-ratings';
@@ -6,18 +6,20 @@ import { RootSiblingParent} from 'react-native-root-siblings'
 
 import * as Api from '../utils/Api.js';
 import QuoteFeedStyles from '../styles/QuoteFeedStyles.js';
+import UserContext from '../utils/UserContext';
 
 // Display additional info about a quote in a Modal
 const RenderQuoteModal = (quote, closeModal) => {
   const [displayedQuote, setDisplayedQuote] = useState(null); // The quote currently being displayed
   const [commentText, setCommentText] = useState("");         // String inside comment box
+  const { userId } = useContext(UserContext);
 
   // Set the displayedQuote when quote is updated
   useEffect(() => {
     const fetchQuote = async () => {
       try {
         if (quote) {
-          const data = await Api.getSpecificQuote(quote);
+          const data = await Api.getSpecificQuote(userId, quote);
           setDisplayedQuote(data);
         }
       } catch (error) {
@@ -30,8 +32,8 @@ const RenderQuoteModal = (quote, closeModal) => {
   // Add comment to database and refresh quote
   const handleCommentPress = async () => {
     try {
-      const response = await Api.addComment(quote, commentText);
-      const refreshedQuote = await Api.getSpecificQuote(quote);
+      const response = await Api.addComment(userId, quote, commentText);
+      const refreshedQuote = await Api.getSpecificQuote(userId, quote);
       setDisplayedQuote(refreshedQuote);
 
       if(response.status == 201) {
@@ -49,8 +51,8 @@ const RenderQuoteModal = (quote, closeModal) => {
   // Add rating and refresh quote
   const handleRatingPress = async(rating) => {
     try {
-      const response = await Api.addRating(quote, rating);
-      const refreshedQuote = await Api.getSpecificQuote(quote);
+      const response = await Api.addRating(userId, quote, rating);
+      const refreshedQuote = await Api.getSpecificQuote(userId, quote);
       setDisplayedQuote(refreshedQuote);
 
       if(response.status == 200) {
@@ -67,8 +69,8 @@ const RenderQuoteModal = (quote, closeModal) => {
   // Add quote to user's bookmark and refresh quote
   const handleBookmarkPress = async() => {
     try {
-      const response = await Api.bookmarkQuote(quote);
-      const refreshedQuote = await Api.getSpecificQuote(quote);
+      const response = await Api.bookmarkQuote(userId, quote);
+      const refreshedQuote = await Api.getSpecificQuote(userId, quote);
       setDisplayedQuote(refreshedQuote);
 
       if(response.status == 201) {
@@ -123,7 +125,7 @@ const RenderQuoteModal = (quote, closeModal) => {
 
               <Text style={QuoteFeedStyles.ModalLabel}>Comments:</Text>
               {displayedQuote.comments.map((comment, index) => (
-                <Text key={index} style={QuoteFeedStyles.ModalText}>User {comment.user_id}: {comment.comment_content}</Text>
+                <Text key={index} style={QuoteFeedStyles.ModalText}>Anonymous: {comment.comment_content}</Text>
               ))}
 
               <View style={QuoteFeedStyles.HorizontalLine}/>

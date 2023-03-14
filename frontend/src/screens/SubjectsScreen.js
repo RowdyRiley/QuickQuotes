@@ -1,23 +1,25 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useContext } from 'react';
 import { View, Text, Pressable, FlatList, TouchableOpacity } from 'react-native';
 import { SelectList } from 'react-native-dropdown-select-list';
 
 import QuoteFeedStyles from '../styles/QuoteFeedStyles';
 import SubjectStyles from '../styles/SubjectStyles';
 import * as Api from '../utils/Api';
+import UserContext from '../utils/UserContext';
 
 export const SubjectsScreen = ({ navigation }) => {
   const [subjectOptions, setSubjectOptions] = React.useState([]);         // List of available options
   const [selectedSubjectKey, setSelectedSubjectKey] = React.useState(""); // Last selected option
   const [userSubjects, setUserSubjects] = React.useState([]);             // User's subjects
+  const { userId } = useContext(UserContext);
 
   // Make API calls when the page is loaded to get
   // the subjectOptions and userSubjects
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const options = await Api.getSubjectOptions();
-        const subjects = await Api.getUserSubjects();
+        const options = await Api.getSubjectOptions(userId);
+        const subjects = await Api.getUserSubjects(userId);
         setSubjectOptions([...options]);
         setUserSubjects([...subjects]);
       } catch (error) {
@@ -39,7 +41,7 @@ export const SubjectsScreen = ({ navigation }) => {
 
     // Add the subject to array
     setUserSubjects(prevUserSubjects => [...prevUserSubjects, newSubject]);
-    Api.addSubjectToDatabase(newSubject);
+    Api.addSubjectToDatabase(userId, newSubject);
   }
 
   // Remove the subject from user's list
@@ -52,7 +54,7 @@ export const SubjectsScreen = ({ navigation }) => {
     // Create new array without the subject, replace the old array
     const newArray = userSubjects.filter((subject) => subject !== subjectToRemove);
     setUserSubjects(newArray);
-    Api.removeSubjectFromDatabase(subjectToRemove);
+    Api.removeSubjectFromDatabase(userId, subjectToRemove);
   }
 
   // Display subject name

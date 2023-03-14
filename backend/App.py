@@ -65,7 +65,7 @@ def get_quote():
 
             # Define Query to insert quote user has seen
             QUERY = f'''INSERT INTO user_quotes_seen (user_id, quote_id)
-                        VALUES ({user_id}, {quote_id})
+                        VALUES ('{user_id}', {quote_id})
                         ON CONFLICT (user_id, quote_id) DO NOTHING;'''
 
             # Execute Query
