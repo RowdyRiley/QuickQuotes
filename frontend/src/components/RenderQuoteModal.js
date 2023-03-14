@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import { View, Text, ScrollView, Pressable, TextInput } from 'react-native';
+import { View, Text, ScrollView, Pressable, TextInput, Clipboard } from 'react-native';
 import Toast from 'react-native-root-toast';
 import { Rating } from 'react-native-ratings';
 import { RootSiblingParent} from 'react-native-root-siblings'
@@ -146,6 +146,10 @@ const RenderQuoteModal = (quote, closeModal) => {
 
               <Pressable style={QuoteFeedStyles.ModalButton} onPress={() => handleBookmarkPress()}>
                 <Text style={QuoteFeedStyles.ModalButtonText}>Bookmark</Text>
+              </Pressable>
+
+              <Pressable style={QuoteFeedStyles.ModalButton} onPress={() => Clipboard.setString("Check out this quote from the Quick Quotes app!:\n\n" + selectedQuote.quote_content + "\n\n-" + selectedQuote.author)}>
+                <Text style={QuoteFeedStyles.ModalButtonText}>Share</Text>
               </Pressable>
               
               <Pressable style={QuoteFeedStyles.ModalButton} onPress={() => closeModal()}>
