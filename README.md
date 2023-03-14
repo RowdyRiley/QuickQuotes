@@ -23,3 +23,7 @@ Use your ip and select any port, such as port. If you do not know your ip, use t
 
 Run webscraper: ```python3 webscraper.py```  
 csv file will be created in csv folder.
+
+Instructions on setting up the tests:
+Navigate to frontend folder
+Install packages: ```npx expo install jest-expo jest -- --legacy-peer-deps```
