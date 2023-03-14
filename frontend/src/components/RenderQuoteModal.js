@@ -150,7 +150,7 @@ const RenderQuoteModal = (quote, closeModal) => {
                 <Text style={QuoteFeedStyles.ModalButtonText}>Bookmark</Text>
               </Pressable>
 
-              <Pressable style={QuoteFeedStyles.ModalButton} onPress={() => Clipboard.setString("Check out this quote from the Quick Quotes app!:\n\n" + selectedQuote.quote_content + "\n\n-" + selectedQuote.author)}>
+              <Pressable style={QuoteFeedStyles.ModalButton} onPress={() => Clipboard.setString("Check out this quote from the Quick Quotes app!:\n\n" + displayedQuote.quote_content + "\n\n-" + displayedQuote.author)}>
                 <Text style={QuoteFeedStyles.ModalButtonText}>Share</Text>
               </Pressable>
               
