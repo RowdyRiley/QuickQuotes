@@ -10,6 +10,7 @@ Run app if on Mac/Linux: ```expo start```
 If on Windows: ```Set-ExecutionPolicy Unrestricted -Scope Process``` then: ```expo start```  
 
 Instructions on setting up the server:  
+Ensure that you have the latest version of Python 3 installed  
 Navigate to backend folder  
 Setup virtual environment: ```python -m venv venv```  
 Start virtual environment if on Mac/Linux: ```. venv/bin/activate```  
