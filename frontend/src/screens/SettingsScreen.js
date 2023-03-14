@@ -1,7 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useState, useEffect, useContext } from 'react';
-import { View, Text, Pressable } from 'react-native';
-import { Modal } from 'react-native';
+import { View, Text, Pressable, Modal } from 'react-native';
+import Toast, { ToastContainer } from 'react-native-root-toast';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { signInAnonymously } from 'firebase/auth';
 
@@ -56,8 +56,11 @@ export const SettingsScreen = ({ navigation }) => {
     signInAnonymously(auth)
       .then((userCredential) => {
         const user = userCredential.user;
-        console.log(user.uid);
         setUserId(user.uid);
+        Toast.show('Logged in as anonymous user.', {
+          duration: Toast.durations.SHORT,
+          position: Toast.positions.CENTER,
+        });
       })
       .catch((error) => {
         const errorCode = error.code;
@@ -97,8 +100,9 @@ export const SettingsScreen = ({ navigation }) => {
         </View>
 
         <View style={SettingStyles.RowContainer}>
+          <ToastContainer />
           <Pressable style={SettingStyles.SettingButton} onPress={handleAnonymousSignIn}>
-              <Text style={SettingStyles.SettingText}>Profile</Text>
+              <Text style={SettingStyles.SettingText}>Login</Text>
           </Pressable>
         </View>
       </View>
