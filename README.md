@@ -6,20 +6,18 @@ Navigate to frontend folder
 Install packages: ```npm install```  
 Navigate to config.js  
 Change the URL to the host and port that you are running your server on  
-Run app: ```expo start```  
+Run app if on Mac/Linux: ```expo start```  
 If on Windows: ```Set-ExecutionPolicy Unrestricted -Scope Process``` then: ```expo start```  
 
 Instructions on setting up the server:  
+Ensure that you have the latest version of Python 3 installed  
 Navigate to backend folder  
-Setup virtual environment: ```python3 -m venv venv```  
-Start virtual environment: ```. venv/bin/activate```  
+Setup virtual environment: ```python -m venv venv```  
+Start virtual environment if on Mac/Linux: ```. venv/bin/activate```  
 If on Windows: ```Set-ExecutionPolicy Unrestricted -Scope Process``` then: ```. venv/Scripts/activate```  
 Install requirements: ```pip install -r ./requirements.txt```  
-.flaskenv contains environment variables for flask for the app location and debugger settings.  
-.env contains environment variables indicating the database URL, retrieved using load_dotenv() from dotenv.    
-
 Run server: ```flask run -h {host} -p {port}```  
 Use your ip and select any port, such as 5000. If you do not know your ip, use the address displayed on expo start.  
 
-Run webscraper: ```python3 webscraper.py```  
+Run webscraper: ```python webscraper.py```  
 csv file will be created in csv folder.
