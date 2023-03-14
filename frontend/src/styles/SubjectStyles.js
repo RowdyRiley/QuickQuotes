@@ -114,6 +114,7 @@ const SubjectStyles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '300',
     color: 'white',
+    accessibilityLabel: 'Subject'
   },
   separator: {
     height: 7,

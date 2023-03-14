@@ -5,6 +5,7 @@ import { SelectList } from 'react-native-dropdown-select-list';
 import QuoteFeedStyles from '../styles/QuoteFeedStyles';
 import SubjectStyles from '../styles/SubjectStyles';
 import * as Api from '../utils/Api';
+import fetch from 'node-fetch';
 
 export const SubjectsScreen = ({ navigation }) => {
   const [subjectOptions, setSubjectOptions] = React.useState([]);         // List of available options
@@ -17,11 +18,13 @@ export const SubjectsScreen = ({ navigation }) => {
     const fetchData = async () => {
       try {
         const options = await Api.getSubjectOptions();
+        console.log('options:**************************', options); 
         const subjects = await Api.getUserSubjects();
+        console.log('subjects:*************************', subjects); 
         setSubjectOptions([...options]);
         setUserSubjects([...subjects]);
       } catch (error) {
-        console.log("Error in Subjects Screen useEffect:", error);
+        console.log("*************************************************************\n***************************************************", error);
       }
     }
     fetchData();

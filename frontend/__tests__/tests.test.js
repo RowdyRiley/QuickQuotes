@@ -156,11 +156,19 @@ describe('Subjects', () => {
         });
         //await findByText('anatomy');
         // Find the dropdown list and click it to open options
-        const dropdown = screen.findByTestId('select');
-        fireEvent.press(dropdown);
+        
+        act(() => {
+            fireEvent.press(screen.getByText("Add new +"));
+        });
+        //const dropdown = screen.findByTestId('select');
+        //fireEvent.press(dropdown);
+
         // Assert that 'anatomy' is visible in the dropdown options
-        const anatomyOption = screen.findByText('anatomy');
-        expect(anatomyOption).toBeVisible();
+        // const anatomyOption = screen.findByText('anatomy');
+        // expect(anatomyOption).toBeVisible();
+        //expect(screen.queryAllByText("anatomy").length).toBe(1);
+        expect(screen.getByLabelText("Subject")).toBeTruthy();
+        expect(screen.getByLabelText("Subject").props.placeholder).toBe("anatomy");
     });
 
     it('Fetches Data', async () => {                  
@@ -175,7 +183,7 @@ describe('Subjects', () => {
         });
       
         const dropdown = await screen.findByTestId('select');
-        await act(async () => {
+        act( () => {
           fireEvent.press(dropdown);
         });
         const anatomyOption = await screen.findByText('anatomy');
