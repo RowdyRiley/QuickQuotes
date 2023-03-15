@@ -4,6 +4,7 @@ import { View, Text, Pressable } from 'react-native';
 import { Modal } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+
 import QuoteFeedStyles from '../styles/QuoteFeedStyles';
 import SettingStyles from '../styles/SettingStyles';
 import RenderNotificationsModal from '../components/RenderNotificationsModal';
@@ -85,19 +86,9 @@ export const SettingsScreen = ({ navigation }) => {
 
         <View style={SettingStyles.RowContainer}>
           <Pressable style={SettingStyles.SettingButton} onPress={() => navigation.navigate('Login')}>
-              <Text style={SettingStyles.SettingText}>Back to Home Screen</Text>
+              <Text style={SettingStyles.SettingText}>Logout</Text>
           </Pressable>
         </View>
-      </View>
-
-      <View style={QuoteFeedStyles.TaskbarBackground}>
-        <Pressable style={QuoteFeedStyles.SubjectsButton} onPress={() => navigation.navigate('Subjects')}>
-          <Text style={QuoteFeedStyles.TaskbarTitleText}>Subjects</Text>
-        </Pressable>
-
-        <Pressable style={QuoteFeedStyles.SettingsButton} onPress={() => navigation.navigate('QuoteFeed')}>
-          <Text style={QuoteFeedStyles.TaskbarTitleText}>QuoteFeed</Text>
-        </Pressable>
       </View>
 
       <Modal
