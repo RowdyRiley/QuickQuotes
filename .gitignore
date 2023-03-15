@@ -3,3 +3,5 @@
 /backend/utils/__pycache__
 /frontend/.expo/
 /frontend/node_modules/
+/testing/.expo/
+/testing/node_modules
