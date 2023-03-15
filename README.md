@@ -28,7 +28,7 @@ csv files will be created in csv folder.
 
 Instructions on running tests:
 Navigate to testing/ 
-npx expo install @testing-library/react-native -- --save-dev --legacy-peer-deps  
+Install packages: ```npx expo install @testing-library/react-native -- --save-dev --legacy-peer-deps```  
 Install packages: ```npm install --save-dev react-test-renderer@^18.1.0 --legacy-peer-deps ```  
 Install packages: ```npm i --save react-native-safe-area-context@4.4.1 ```  
 Install packages: ```npx expo install jest-expo jest -- --legacy-peer-deps```  
