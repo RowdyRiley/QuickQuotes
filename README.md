@@ -27,6 +27,6 @@ Run webscraper: ```python webscraper.py```
 csv files will be created in csv folder.
 
 Instructions on running tests:
-Navigate to testing/frontend/
-Install packages: ```npx expo install jest-expo jest -- --legacy-peer-deps``` 
+Navigate to testing/frontend/  
+Install packages: ```npx expo install jest-expo jest -- --legacy-peer-deps```   
 Run tests: ```npm run test```
