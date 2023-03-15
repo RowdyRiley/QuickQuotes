@@ -27,7 +27,8 @@ Run webscraper: ```python webscraper.py```
 csv files will be created in csv folder.
 
 Instructions on running tests:  
-Navigate to testing/ 
+Navigate to testing/  
+Install packes: ```npm install```  
 Install packages: ```npx expo install @testing-library/react-native -- --save-dev --legacy-peer-deps```  
 Install packages: ```npm install --save-dev react-test-renderer@^18.1.0 --legacy-peer-deps ```  
 Install packages: ```npm i --save react-native-safe-area-context@4.4.1 ```  
