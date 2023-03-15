@@ -29,23 +29,8 @@ csv files will be created in csv folder.
 Instructions on running tests:
 Navigate to testing/ 
 npx expo install @testing-library/react-native -- --save-dev --legacy-peer-deps  
-npm install --save-dev react-test-renderer@^18.1.0 --legacy-peer-deps  
-npm i --save react-native-safe-area-context@4.4.1  
-In package.config.js, add "test" in "scripts" and add "jest":  
-"scripts": {  
-    ...  
-    "test": "jest"  
-},  
-"jest": {  
-    "preset": "jest-expo"  
-}  
-
-npx expo install jest-expo jest -- --legacy-peer-deps  
-
-create new folder called 'babel.config.js' which contains:  
-module.exports = {  
-  presets: ['module:metro-react-native-babel-preset'],  
-};  
-
+Install packages: ```npm install --save-dev react-test-renderer@^18.1.0 --legacy-peer-deps ```  
+Install packages: ```npm i --save react-native-safe-area-context@4.4.1 ```  
+Install packages: ```npx expo install jest-expo jest -- --legacy-peer-deps```  
 Install packages: ```npx expo install jest-expo jest -- --legacy-peer-deps```     
 Run tests: ```npm run test```  
