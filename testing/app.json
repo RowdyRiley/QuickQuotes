@@ -1,0 +1,10 @@
+{
+  "expo": {
+    "name": "QuickQuotes",
+    "slug": "QuickQuotes",
+    "version": "1.0.0",
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  }
+}
