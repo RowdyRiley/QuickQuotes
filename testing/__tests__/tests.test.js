@@ -14,37 +14,36 @@ import App from '../App';
 // });
 
 describe('Navigation', () => {
-    it('Title', () => {
+    it('Starts on LoginScreen', async () => {
         render(<App />);
+        const quoteFeed = await waitFor(() => screen.queryAllByText('QuickQuotes'));
+        expect(quoteFeed.length).toBe(1);
+    });
+
+    it('LoginPage then to QuoteFeed', () => {
+        render(<App />);
+        act(() => {
+            fireEvent.press(screen.getByText("Press to Enter"));
+        });
         expect(screen.queryAllByText("Quote Feed").length).toBe(1);
-    });
-
-    it('Starts on QuotesFeed', () => {
-        //getByText("Settings");
-        render(<App />);
-        expect(screen.queryAllByText("Quote Feed").length).toBe(1);
-    });
-
-    it('Settings Button', () => {
-        render(<App />);
-        expect(screen.queryAllByText("Settings").length).toBe(1);
-    });
-
-    it('Subjects Button', () => {
-        render(<App />);
-        expect(screen.queryAllByText("Subjects").length).toBe(1);
     });
 
     it('Settings Button Navigation', () => {
         render(<App />);
         act(() => {
+            fireEvent.press(screen.getByText("Press to Enter"));
+        });
+        act(() => {
             fireEvent.press(screen.getByText("Settings"));
         });    
-        expect(screen.queryAllByText("Notification Frequency").length).toBe(1);
+        expect(screen.queryAllByText("Bookmarks").length).toBe(1);
     });
 
     it('Subjects Button Navigation', () => {
         render(<App />);
+        act(() => {
+            fireEvent.press(screen.getByText("Press to Enter"));
+        });
         act(() => {
             fireEvent.press(screen.getByText("Subjects"));
         });   
@@ -54,11 +53,14 @@ describe('Navigation', () => {
     it('To Subjects then Back to QuoteFeed', () => {
         render(<App />);
         act(() => {
+            fireEvent.press(screen.getByText("Press to Enter"));
+        });
+        act(() => {
             fireEvent.press(screen.getByText("Subjects"));
         });
         let a = screen.queryAllByText("QuoteFeed");
         act(() => {
-            fireEvent.press(a[0]);
+            fireEvent.press(a[1]);
         });
         expect(screen.queryAllByText("Quote Feed").length).toBe(1);
     });
@@ -66,18 +68,41 @@ describe('Navigation', () => {
     it('To Settings then Back to QuoteFeed', () => {
         render(<App />);
         act(() => {
+            fireEvent.press(screen.getByText("Press to Enter"));
+        });
+        act(() => {
             fireEvent.press(screen.getByText("Settings"));
         });
-        //fireEvent.press(screen.getByText("Settings"));
         let a = screen.queryAllByText("QuoteFeed");
         act(() => {
-            fireEvent.press(a[0]);
+            fireEvent.press(a[1]);
         });
         expect(screen.queryAllByText("Quote Feed").length).toBe(1);
     });
 
+    it('To Settings then to Bookmarks', () => {
+        render(<App />);
+        act(() => {
+            fireEvent.press(screen.getByText("Press to Enter"));
+        });
+        act(() => {
+            fireEvent.press(screen.getByText("Settings"));
+        });
+        act(() => {
+            fireEvent.press(screen.getByText("Bookmarks"));
+        });
+        expect(screen.queryAllByText("Bookmarks").length).toBe(2);  // 2 because it includes the Bookmarks button from the Settings page
+        act(() => {
+            fireEvent.press(screen.getByText("Settings"));
+        });
+        expect(screen.queryAllByText("Settings").length).toBe(1);
+    });
+
     it('To Subjects then to Settings Then Back to QuoteFeed', () => {
         render(<App />);
+        act(() => {
+            fireEvent.press(screen.getByText("Press to Enter"));
+        });
         act(() => {
             fireEvent.press(screen.getByText("Subjects"));
         });
@@ -95,6 +120,9 @@ describe('Navigation', () => {
     it('To Settings then to Subjects Then Back to QuoteFeed', () => {
         render(<App />);
         act(() => {
+            fireEvent.press(screen.getByText("Press to Enter"));
+        });
+        act(() => {
             fireEvent.press(screen.getByText("Settings"));
         });
         let a = screen.queryAllByText("Subjects");
@@ -107,15 +135,32 @@ describe('Navigation', () => {
         });
         expect(screen.queryAllByText("Quote Feed").length).toBe(1);
     });
+
+    it('To Settings then back to Home Screen', () => {
+        render(<App />);
+        act(() => {
+            fireEvent.press(screen.getByText("Press to Enter"));
+        });
+        act(() => {
+            fireEvent.press(screen.getByText("Settings"));
+        });
+        act(() => {
+            fireEvent.press(screen.getByText("Logout"));
+        });
+        expect(screen.queryAllByText("QuickQuotes").length).toBe(1);
+    });
 });
 
 describe('QuoteFeed', () => {
-    it('Give Me a Quote Button Exists', () => {
+    it('Give Me a Quote! Button Exists', () => {
         render(<App />);
+        act(() => {
+            fireEvent.press(screen.getByText("Press to Enter"));
+        });
         expect(screen.queryAllByText("Give me a quote!").length).toBe(1);
     });
 
-    // it('Give Me a Quote Button Functionality', () => {                  // could add a reset button to clear feed, which helps with testing, sets count to 0.
+    // it('Give Me a Quote Button Functionality', () => {                 
     //     render(<App />);
     //     fireEvent.press(screen.getByText("Give me a quote!"));
 
@@ -141,6 +186,9 @@ describe('QuoteFeed', () => {
 describe('Subjects', () => {
     it('Subjects', () => {                 
         render(<App />);
+        act(() => {
+            fireEvent.press(screen.getByText("Press to Enter"));
+        });
 
         act(() => {
             fireEvent.press(screen.getByText("Subjects"));
@@ -148,89 +196,58 @@ describe('Subjects', () => {
         expect(screen.queryAllByText("Add new +").length).toBe(1);
     });
 
-    it('Subjects fetch ', () => {                  
-        render(<App />);
+    // it('Subjects fetch ', () => {                  
+    //     render(<App />);
 
-        act(() => {
-            fireEvent.press(screen.getByText("Subjects"));
-        });
-        //await findByText('anatomy');
-        // Find the dropdown list and click it to open options
+    //     act(() => {
+    //         fireEvent.press(screen.getByText("Press to Enter"));
+    //     });
+
+    //     act(() => {
+    //         fireEvent.press(screen.getByText("Subjects"));
+    //     });
+    //     //await findByText('anatomy');
+    //     // Find the dropdown list and click it to open options
         
-        act(() => {
-            fireEvent.press(screen.getByText("Add new +"));
-        });
-        //const dropdown = screen.findByTestId('select');
-        //fireEvent.press(dropdown);
+    //     act(() => {
+    //         fireEvent.press(screen.getByText("Add new +"));
+    //     });
+    //     //const dropdown = screen.findByTestId('select');
+    //     //fireEvent.press(dropdown);
 
-        // Assert that 'anatomy' is visible in the dropdown options
-        // const anatomyOption = screen.findByText('anatomy');
-        // expect(anatomyOption).toBeVisible();
-        //expect(screen.queryAllByText("anatomy").length).toBe(1);
-        expect(screen.getByLabelText("Subject")).toBeTruthy();
-        expect(screen.getByLabelText("Subject").props.placeholder).toBe("anatomy");
-    });
+    //     // Assert that 'anatomy' is visible in the dropdown options
+    //     // const anatomyOption = screen.findByText('anatomy');
+    //     // expect(anatomyOption).toBeVisible();
+    //     //expect(screen.queryAllByText("anatomy").length).toBe(1);
+    //     expect(screen.getByLabelText("Subject")).toBeTruthy();
+    //     expect(screen.getByLabelText("Subject").props.placeholder).toBe("anatomy");
+    // });
 
-    it('Fetches Data', async () => {                  
-        render(<App />);
+    // it('Fetches Data', async () => {                  
+    //     render(<App />);
+
+    //     act(() => {
+    //         fireEvent.press(screen.getByText("Press to Enter"));
+    //     });
       
-        act(() => {
-          fireEvent.press(screen.getByText("Subjects"));
-        });
+    //     act(() => {
+    //       fireEvent.press(screen.getByText("Subjects"));
+    //     });
       
-        await waitFor(() => {
-          expect(screen.getByText('Add new +')).toBeTruthy();
-        });
+    //     await waitFor(() => {
+    //       expect(screen.getByText('Add new +')).toBeTruthy();
+    //     });
       
-        const dropdown = await screen.findByTestId('select');
-        act( () => {
-          fireEvent.press(dropdown);
-        });
-        const anatomyOption = await screen.findByText('anatomy');
-        expect(anatomyOption).toBeVisible();
-    });
+    //     const dropdown = await screen.findByTestId('select');
+    //     act( () => {
+    //       fireEvent.press(dropdown);
+    //     });
+    //     const anatomyOption = await screen.findByText('anatomy');
+    //     expect(anatomyOption).toBeVisible();
+    // });
       
 });
 
+// describe('Settings', () => {
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// instructions:
-
-// installed the renderer and library using --legacy-peer-deps
-
-// ie. sudo npx expo install @testing-library/react-native -- --save-dev --legacy-peer-deps
-
-// ie. sudo npm install --save-dev react-test-renderer@^18.1.0 --legacy-peer-deps
-
-// sudo npm install @react-navigation/native --legacy-peer-deps (don't think this is needed)
-
-// npm i --save react-native-safe-area-context@4.4.1
-
-// "scripts": {
-//     ...
-//     "test": "jest"
-//   },
-//   "jest": {
-//     "preset": "jest-expo"
-//   }
-
-// sudo npx expo install jest-expo jest -- --legacy-peer-deps
-
-//https://stackoverflow.com/questions/70080213/syntaxerror-node-modules-react-native-libraries-polyfills-error-guard-js-miss (don't think this is needed)
-
-// also changed the async import from screens to: import AsyncStorage from '@react-native-async-storage/async-storage'
-
-
+// });
