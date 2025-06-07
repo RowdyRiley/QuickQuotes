@@ -1,7 +1,7 @@
-# QuickQuotes
-CSE 115 Group Project
+# QuickQuotes - Quote Delivery App
+Work-in-progress React Native app with Flask backend and Firebase authentication/notifications.
 
-Instructions on setting up the server:  
+## Setting up the server:  
 Ensure that you have the latest version of Python 3 installed  
 Navigate to backend/  
 Setup virtual environment: ```python -m venv venv```  
@@ -11,7 +11,7 @@ Install requirements: ```pip install -r ./requirements.txt```
 Run server: ```flask run -h {host} -p {port}```  
 Use your ip and select any port, such as port. If you do not know your ip, use the address displayed on expo start or use ipconfig.  
 
-Instructions on setting up the app:  
+## Setting up the app:  
 Navigate to frontend/  
 Install packages: ```npm install```  
 Navigate to config.js  
@@ -21,12 +21,7 @@ If on Windows: ```Set-ExecutionPolicy Unrestricted -Scope Process``` then: ```ex
 Ensure that your mobile device is on the same network as expo  
 Scan the QR code with Expo Go  
 
-Instructions on running webscraper:  
-Navigate to backend/webscraper/  
-Run webscraper: ```python webscraper.py```  
-csv files will be created in csv folder.
-
-Instructions on running tests:  
+## Running tests:  
 Navigate to testing/  
 Install packages: ```npm install --legacy-peer-deps```  
 Install packages: ```npx expo install @testing-library/react-native -- --save-dev --legacy-peer-deps```  
